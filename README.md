@@ -1,1 +1,1 @@
-![Gantt Chart](Images/gant.PNG)
+![Gantt Chart](Documents/Images/gant.PNG)
