@@ -1,41 +1,52 @@
-```mermaid
 gantt
-    title Projet bancaire - Gantt (2 au 23 Juin)
+    title Projet bancaire – Gantt final avec technologies (2 au 23 Juin 2025)
     dateFormat  YYYY-MM-DD
     excludes    weekends
-    %% Définition des groupes
-    section Planification & Infra
-    Définition de l'architecture             :done, a1, 2025-06-02, 2d
-    Mise en place de l'infrastructure VM    :done, a2, after a1, 2d
-    Conteneurisation (Docker + NATS)        :a3, after a2, 2d
 
+    %% ---------------- INFRASTRUCTURE & CONTAINERS ----------------
+    section Infra & Conteneurisation
+    Choix stack (Django REST / FastAPI + MySQL)   :done, s1, 2025-06-02, 1d
+    Dockerisation des services API                :s2, after s1, 1d
+    Dockerisation base MySQL                      :s3, after s2, 1d
+    Création d’un réseau Docker (bridge)          :s4, after s3, 1d
+    Déploiement service NATS via Docker           :s5, after s4, 1d
+    Tests communication inter-conteneurs          :s6, after s5, 1d
+
+    %% ---------------- AUTHENTIFICATION ----------------
     section Authentification
-    Authentification site/API               :b1, 2025-06-06, 2d
-    Création de compte utilisateur          :b2, after b1, 2d
+    API d'inscription / login (JWT)               :a1, 2025-06-05, 1d
+    Intégration backend Django REST/FastAPI       :a2, after a1, 1d
+    Sécurisation accès API (permissions)          :a3, after a2, 1d
 
-    section Gestion des comptes privés
-    Modèle des comptes                      :c1, 2025-06-10, 1d
-    Dépôt / Retrait                         :c2, after c1, 2d
-    Virement entre comptes                  :c3, after c2, 2d
+    %% ---------------- COMPTES CLIENT ----------------
+    section Gestion clients & opérations
+    Modèle utilisateur, comptes, opérations       :b1, 2025-06-08, 1d
+    API dépôt / retrait / virement                :b2, after b1, 1d
+    Historique et solde actuel (API + DB)         :b3, after b2, 1d
 
-    section Gestion Agent Bancaire
-    Validation opérations                   :d1, 2025-06-10, 3d
-    Visualisation comptes clients           :d2, after d1, 2d
-    Validation création de compte           :d3, after d2, 2d
-    Ajout infos : solde, date op            :d4, after d3, 1d
+    %% ---------------- GESTION AGENTS ----------------
+    section Gestion des agents bancaires
+    API validation création de comptes            :c1, 2025-06-10, 1d
+    API validation opérations clients             :c2, after c1, 1d
+    Interface lecture comptes (montant, date...)  :c3, after c2, 1d
+    Authentification et droits des agents         :c4, after c3, 1d
 
-    section Gestion des logs (NATS)
-    Mise en place service logging           :e1, 2025-06-10, 2d
-    Intégration NATS dans APIs              :e2, after e1, 2d
-    Stockage logs dans base de données      :e3, after e2, 2d
+    %% ---------------- LOGGING ----------------
+    section Logging NATS & persistances
+    Intégration NATS publisher dans API           :d1, 2025-06-12, 1d
+    Développement du service subscriber (NATS)    :d2, after d1, 1d
+    Sauvegarde des logs dans MySQL                :d3, after d2, 1d
+    Ajout filtres date/type pour consultation     :d4, after d3, 1d
 
-    section Dashboard & Statistiques
-    Création dashboard logs/ops             :f1, 2025-06-17, 2d
-    Sélecteur de période/type de log        :f2, after f1, 1d
-    Statistiques d'opérations               :f3, after f2, 1d
+    %% ---------------- DASHBOARD ----------------
+    section Tableau de bord & statistiques
+    API stats : nb opérations, utilisateurs, etc. :e1, 2025-06-15, 1d
+    Interface dashboard (texte/JSON, REST)        :e2, after e1, 1d
 
-    section Finalisation et tests
-    Tests unitaires et fonctionnels         :g1, 2025-06-19, 2d
-    Corrections et améliorations            :g2, after g1, 1d
-    Rendu Moodle et documentation           :g3, 2025-06-23, 1d
-```
+    %% ---------------- LIVRABLES ----------------
+    section Livrables finaux
+    Rédaction rapport individuel                  :f1, 2025-06-17, 2d
+    Validation compétences & réalisations         :f2, after f1, 1d
+    Finalisation dépôt GitHub (projet + README)   :f3, 2025-06-20, 1d
+    Préparation présentation orale (slides)       :f4, 2025-06-20, 1d
+    Soutenance finale (15–20 min)                 :f5, 2025-06-23, 1d
