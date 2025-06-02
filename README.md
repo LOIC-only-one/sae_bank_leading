@@ -1,3 +1,6 @@
+```mermaid
+
+
 gantt
     title Projet bancaire – Planification Juin 2025
     dateFormat  YYYY-MM-DD
@@ -28,5 +31,6 @@ gantt
     section Livrables
     Rapport individuel                           :2025-06-19, 2d
     Lien GitHub final                            :2025-06-21, 1d
-    Présentation orale (slides)                  :2025-06-22, 1d
+    Présentation orale                           :2025-06-22, 1d
     Soutenance                                   :2025-06-23, 1d
+```
