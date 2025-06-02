@@ -10,39 +10,37 @@ gantt
     Mise en place BDD               :db-setup, after nats-docker, 1d
 
     section Authentification
-    API Auth (login + création)     :auth-api, after db-setup, 2d
-    Interface web (authentification):auth-ui, after auth-api, 2d
+    API Auth (login + création)     :auth-api, 2025-06-05, 2d
+    Interface web (authentification):auth-ui, after auth-api, 1d
     Tests Authentification          :auth-test, after auth-ui, 1d
 
     section Gestion Client
     API Comptes (CRUD + montant)    :client-api, 2025-06-08, 2d
     API Opérations (Retrait/Dépôt)  :ops-api, after client-api, 2d
     API Virement entre comptes      :virement-api, after ops-api, 1d
-    Interface client (web)          :client-ui, after virement-api, 2d
+    Interface client (web)          :client-ui, after virement-api, 1d
     Tests gestion client            :client-test, after client-ui, 1d
 
     section Agents Bancaires
     API Validation opérations       :agent-api, 2025-06-13, 2d
-    Interface agent bancaire        :agent-ui, after agent-api, 2d
+    Interface agent bancaire        :agent-ui, after agent-api, 1d
     API Visualisation comptes       :view-api, after agent-ui, 1d
     Dashboard agents                :dashboard-agent, after view-api, 1d
     Tests agents                    :agent-test, after dashboard-agent, 1d
 
-    section Logging NATS
-    Publication logs (par API)      :log-publish, 2025-06-17, 1d
-    Collecte via NATS               :log-collect, after log-publish, 2d
-    Stockage base de données        :log-db, after log-collect, 1d
-    API consultation logs           :log-api, after log-db, 1d
-    Interface web logs + filtres    :log-ui, after log-api, 2d
-    Statistiques / Dashboard logs   :log-stats, after log-ui, 1d
+    section Logging via NATS
+    Publication logs (par API)      :log-publish, 2025-06-18, 1d
+    Collecte + stockage BDD         :log-collect, after log-publish, 1d
+    API consultation logs           :log-api, after log-collect, 1d
+    Interface logs + filtres        :log-ui, after log-api, 1d
+    Dashboard stats logs            :log-stats, after log-ui, 1d
 
     section Finalisation
-    Revue avec enseignant (étape 1) :milestone, checkpoint1, 2025-06-18, 1d
-    Tests d'intégration finaux      :integration, after checkpoint1, 2d
+    Tests d'intégration finaux      :integration, 2025-06-21, 1d
     Documentation technique         :doc-tech, after integration, 1d
-    Documentation utilisateur       :doc-user, after doc-tech, 1d
-    Préparation soutenance          :prep, after doc-user, 1d
+    Documentation utilisateur       :doc-user, after doc-tech, 0.5d
+    Préparation soutenance          :prep, after doc-user, 0.5d
 
-    section Livraison FI
-    Livraison finale                :milestone, delivery-fi, 2025-06-23, 1d
+    section Livraison
+    Livraison finale (avant 23 juin):delivery, 2025-06-23, 1d
 ```
