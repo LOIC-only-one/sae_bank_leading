@@ -26,7 +26,7 @@ class User(AbstractUser):
     
     ### Propriétés pour vérifier le rôle de l'utilisateur
     @property
-    def is_superuser(self):
+    def is_superuser_role(self):
         return self.role == self.UserRoles.SUPER_USER
     
     @property
@@ -37,5 +37,13 @@ class User(AbstractUser):
     def is_client(self):
         return self.role == self.UserRoles.CLIENT
     
+
+    def save(self, *args, **kwargs):
+        # Si c'est un superuser Django, on lui donne automatiquement le role SUPER_USER
+        if self.is_superuser:
+            self.role = self.UserRoles.SUPER_USER
+            self.is_active = True
+        super().save(*args, **kwargs)
+    
     class Meta:
-        db_table = 'auth_user'
+        db_table = 'auth_users'
