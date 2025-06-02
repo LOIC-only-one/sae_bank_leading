@@ -1,36 +1,47 @@
 ```mermaid
-
-
 gantt
     title Projet bancaire – Planification Juin 2025
     dateFormat  YYYY-MM-DD
+    excludes weekends
 
-    section Infrastructure
-    Choix techno (Django/FastAPI + Docker)       :done, 2025-06-02, 1d
-    Mise en place Docker + MySQL + NATS          :active, 2025-06-03, 3d
+    section Planification & Analyse
+    Prise en main du sujet & découpage des tâches     :done, 2025-06-02, 1d
+    Recherche techno (Docker, Django/FastAPI, NATS)   :done, 2025-06-03, 1d
+    Choix final des techno + maquette archi           :done, 2025-06-04, 2d
+
+    section Infrastructure technique
+    Init VM & environnement Docker                    :2025-06-06, 1d
+    Conteneurisation MySQL + NATS                     :2025-06-09, 1d
+    Base projet API Django/FastAPI                    :2025-06-10, 1d
+    Configuration réseau interne Docker + tests       :2025-06-11, 1d
 
     section Authentification
-    API login/signup + sécurité                  :2025-06-06, 2d
+    API login/signup (DRF ou FastAPI)                 :2025-06-12, 2d
+    Sécurisation JWT / permissions                    :2025-06-13, 1d
 
     section Gestion clients
-    API dépôt/retrait/virement                   :2025-06-08, 2d
-    Affichage historique et soldes               :2025-06-10, 1d
+    API dépôt / retrait / virement                    :2025-06-16, 2d
+    Historique client + soldes                        :2025-06-18, 1d
+    Tests unitaires + intégration                     :2025-06-19, 1d
 
     section Agents bancaires
-    Validation opérations                        :2025-06-11, 2d
-    Lecture comptes clients                      :2025-06-13, 1d
+    Back-office agent : validation opérations         :2025-06-20, 1d
+    Vue lecture comptes clients                       :2025-06-20, 1d
+    Ajout infos : solde, dernière op, etc.            :2025-06-21, 1d
 
-    section Logs NATS
-    Intégration NATS Publisher                   :2025-06-14, 1d
-    Service Listener + stockage DB               :2025-06-15, 2d
+    section Logs & Monitoring
+    Intégration Publisher NATS dans APIs              :2025-06-23, 1d
+    Service Listener log & insertion BDD              :2025-06-24, 1d
+    Sélecteur période + type de logs                  :2025-06-25, 1d
 
     section Dashboard
-    API statistiques / logs                      :2025-06-17, 1d
-    Interface Web (JSON ou texte)                :2025-06-18, 1d
+    API statistique opérations / logs                 :2025-06-26, 1d
+    Interface Web de consultation (JSON/text)         :2025-06-27, 1d
 
-    section Livrables
-    Rapport individuel                           :2025-06-19, 2d
-    Lien GitHub final                            :2025-06-21, 1d
-    Présentation orale                           :2025-06-22, 1d
-    Soutenance                                   :2025-06-23, 1d
+    section Documentation & Rendus
+    Rédaction rapport individuel                      :2025-06-18, 3d
+    Lien GitHub propre avec commits et README         :2025-06-21, 1d
+    Création slides + support oral                    :2025-06-22, 1d
+    Présentation orale / soutenance                   :2025-06-23, 1d
+
 ```
