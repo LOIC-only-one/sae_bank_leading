@@ -1,1 +1,1 @@
-![text_gantt](https://www.mermaidchart.com/raw/4859fcbc-6ded-462b-95b8-7f039545649a?theme=light&version=v0.1&format=svg)
+![Gantt Chart](Images/gant.PNG)
