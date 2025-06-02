@@ -39,7 +39,6 @@ gantt
     Tests d'intégration finaux      :integration, 2025-06-21, 1d
     Documentation technique         :doc-tech, after integration, 1d
     Documentation utilisateur       :doc-user, after doc-tech, 0.5d
-    Préparation soutenance          :prep, after doc-user, 0.5d
 
     section Livraison
     Livraison finale (avant 23 juin):delivery, 2025-06-23, 1d
