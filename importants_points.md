@@ -1,8 +1,7 @@
-🎯 Résumé rapide de ce que tu dois savoir
-✅ Si tes APIs sont stateless et exposées publiquement (ce qui est souvent le cas en microservices) :
-Tu n’as pas besoin de CSRF car tu n’utilises pas de cookies pour l’authentification.
+https://medium.com/django-unleashed/token-based-authentication-and-authorization-in-django-rest-framework-user-and-permissions-347c7cc472e9 = Authentification with tokens in Django Rest Framework
 
-➡️ Tu dois désactiver la vérification CSRF sur tes APIs.
-➡️ Et utiliser un autre mécanisme d’authentification, comme un token JWT, ou un token d’API.
+https://www.youtube.com/watch?v=llrIu4Qsl7c = Django Rest Framework - Token Authentication
 
+https://dev.to/mayowakalejaiye/mastering-django-building-a-secure-user-authentication-api-from-scratch-4ma3 = Mastering Django: Building a Secure User Authentication API from Scratch
 
+https://www.django-rest-framework.org/tutorial/1-serialization/ = Django Rest Framework - Serialization

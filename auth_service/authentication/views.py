@@ -2,9 +2,11 @@ from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth import get_user_model, logout
 from django.shortcuts import get_object_or_404
 from .serializers import RegisterSerializer, LoginSerializer, UserProfileSerializer, UserListSerializer, UserValidationSerializer
+from rest_framework.authtoken.models import Token
+
 
 
 User = get_user_model()
@@ -46,14 +48,24 @@ class LoginView(APIView):
             - 400 : Erreur de validation ou identifiants invalides.
     """
     permission_classes = [permissions.AllowAny]
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
-            login(request, user)
-            return Response({'message': 'Connexion réussie', 'user': {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role, 'role_display': user.get_role_display(), 'is_active': user.is_active}}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
 
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({
+            "token": token.key,
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "role": user.role,
+                "email": user.email,
+            }
+        })
+    
 class ProfileView(APIView):
     """
     ProfileView(APIView)
@@ -191,11 +203,9 @@ def logout_view(request):
 # Création d'un agent par un superutilisateur
 ##############################################################################################
 
-
 class IsSuperUserRole(permissions.BasePermission):
-    def has_permission(self, request):
+    def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.is_superuser_role
-
 class AgentCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsSuperUserRole]
 

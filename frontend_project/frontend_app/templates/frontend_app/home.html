@@ -1,9 +1,17 @@
 <!DOCTYPE html>
-<html>
-<head><title>Accueil</title></head>
-<body>
-  <h1>Bienvenue {{ profile.username }}</h1>
-  <p>Email : {{ profile.email }}</p>
-  <a href="{% url 'logout' %}">Déconnexion</a>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Accueil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 m-0 p-0 font-sans">
+  <div class="max-w-md mx-auto mt-16 bg-white p-8 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Bienvenue, {{ user.username }} !</h1>
+    <div class="mb-6">
+      <p><span class="font-semibold">Email :</span> {{ user.email }}</p>
+    </div>
+    <a href="{% url 'logout' %}" class="inline-block bg-red-500 text-white px-5 py-2 rounded hover:bg-red-700 transition">Déconnexion</a>
+  </div>
 </body>
 </html>

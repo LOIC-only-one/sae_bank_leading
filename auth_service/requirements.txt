@@ -1,4 +1,3 @@
 djangorestframework
 python-decouple
 django-cors-headers
-drf-yasg

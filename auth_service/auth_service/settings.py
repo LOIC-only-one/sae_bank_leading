@@ -41,8 +41,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'authentication',  # Custom app for authentication
+    'authentication', # sert a quoi ?
+    'rest_framework.authtoken',
+
 ]
+
+### Ajouté pour eviter les bloquages CORS (Cross-Origin Resource Sharing) => CORS sert les pour autoriser les requêtes cross-origin
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8001",
+    "http://localhost:8001",
+]
+
 
 
 MIDDLEWARE = [
@@ -53,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'auth_service.urls'
