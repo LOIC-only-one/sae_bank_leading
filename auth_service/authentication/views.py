@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model, login, logout
 from django.shortcuts import get_object_or_404
 from .serializers import RegisterSerializer, LoginSerializer, UserProfileSerializer, UserListSerializer, UserValidationSerializer
 
+
 User = get_user_model()
 
 class RegisterView(APIView):
@@ -183,21 +184,13 @@ def logout_view(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+##############################################################################################
+# Création d'un agent par un superutilisateur
+##############################################################################################
 
 
 class IsSuperUserRole(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request):
         return request.user.is_authenticated and request.user.is_superuser_role
 
 class AgentCreateView(APIView):
