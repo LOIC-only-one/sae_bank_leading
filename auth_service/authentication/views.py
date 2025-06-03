@@ -123,25 +123,28 @@ class UserValidationView(APIView):
         - Permissions : Seuls les agents ou superutilisateurs peuvent accéder à cette vue.
         - Paramètres :
             - user_id (int) : Identifiant de l'utilisateur à valider ou rejeter.
-            - Corps de la requête : { "is_active": bool }
+            - Corps de la requête : { "is_active": bool, "reason": str (optionnel) }
         - Réponses :
             - 200 : Compte validé ou rejeté avec succès, retourne les informations de l'utilisateur.
             - 400 : Erreur de validation ou l'utilisateur n'est pas un client.
             - 403 : Permission refusée si l'utilisateur authentifié n'est ni agent ni superutilisateur.
     """
     permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, user_id):
         if not (request.user.is_agent or request.user.is_superuser_role):
             return Response({'error': 'Permission refusée'}, status=status.HTTP_403_FORBIDDEN)
+
         user = get_object_or_404(User, id=user_id)
+
         if user.role != User.UserRoles.CLIENT:
-            return Response({'error': 'Seuls les comptes clients peuvent être validés'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "Seuls les comptes client peuvent être validés."}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = UserValidationSerializer(data=request.data)
         if serializer.is_valid():
             user.is_active = serializer.validated_data['is_active']
             user.save()
-            action = "validé" if user.is_active else "rejeté"
-            return Response({'message': f'Compte {action} avec succès', 'user': UserListSerializer(user).data})
+            return Response({'message': 'Compte mis à jour avec succès', 'user': UserListSerializer(user).data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PendingUsersView(APIView):
