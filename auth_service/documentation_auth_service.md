@@ -16,11 +16,15 @@ Cette API REST permet la gestion complète des utilisateurs avec un système de 
 #### Paramètres du corps de requête
 ```json
 {
-  "username": "string",      // Nom d'utilisateur (requis)
-  "email": "string",         // Adresse email (requis)
-  "password": "string",      // Mot de passe (requis)
-  "first_name": "string",    // Prénom (optionnel)
-  "last_name": "string"      // Nom de famille (optionnel)
+  "username": "string",         // Nom d'utilisateur (requis)
+  "email": "string",            // Adresse email (requis)
+  "password": "string",         // Mot de passe (requis)
+  "password_confirm": "string", // Confirmation du mot de passe (requis)
+  "first_name": "string",       // Prénom (requis)
+  "last_name": "string",        // Nom de famille (requis)
+  "phone_number": "string",     // Numéro de téléphone (optionnel)
+  "address": "string",          // Adresse (optionnel)
+  "role": "string"              // Rôle (CLIENT par défaut, optionnel)
 }
 ```
 
@@ -39,6 +43,10 @@ Cette API REST permet la gestion complète des utilisateurs avec un système de 
 }
 ```
 - **400 Bad Request** - Erreur de validation
+  - Mots de passe ne correspondent pas
+  - Mot de passe ne respecte pas les critères de validation Django
+  - Email ou username déjà utilisé
+  - Champs requis manquants
 
 ---
 
@@ -72,6 +80,8 @@ Cette API REST permet la gestion complète des utilisateurs avec un système de 
 }
 ```
 - **400 Bad Request** - Identifiants invalides ou erreur de validation
+  - "Identifiants incorrects"
+  - "Compte désactivé" (compte non validé par un agent)
 
 ---
 
@@ -93,6 +103,7 @@ Aucun paramètre requis
 ```
 
 ---
+################################## GADGETION DU PROFIL ##################################
 
 ## 👤 Gestion du Profil
 
@@ -114,8 +125,12 @@ Aucun paramètre requis
   "email": "email@example.com",
   "first_name": "Prénom",
   "last_name": "Nom",
+  "phone_number": "+33123456789",
+  "address": "123 Rue Example, Ville",
   "role": "CLIENT",
-  "is_active": true
+  "role_display": "Client",
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated_at": "2024-01-01T12:00:00Z"
 }
 ```
 
@@ -130,31 +145,14 @@ Aucun paramètre requis
 #### Paramètres du corps de requête (tous optionnels)
 ```json
 {
-  "username": "string",     // Nouveau nom d'utilisateur
   "email": "string",        // Nouvelle adresse email
   "first_name": "string",   // Nouveau prénom
-  "last_name": "string"     // Nouveau nom de famille
+  "last_name": "string",    // Nouveau nom de famille
+  "phone_number": "string", // Nouveau numéro de téléphone
+  "address": "string"       // Nouvelle adresse
 }
 ```
-
-#### Réponses
-- **200 OK** - Profil mis à jour
-```json
-{
-  "message": "Profil mis à jour avec succès",
-  "user": {
-    "id": 1,
-    "username": "nouveau_utilisateur",
-    "email": "nouvel_email@example.com",
-    "first_name": "Nouveau Prénom",
-    "last_name": "Nouveau Nom",
-    "role": "CLIENT",
-    "is_active": true
-  }
-}
-```
-- **400 Bad Request** - Erreur de validation
-
+################################## GADGETION DU PROFIL ##################################
 ---
 
 ## 👥 Gestion des Utilisateurs (Agent/Superutilisateur)
@@ -182,15 +180,23 @@ Aucun paramètre requis
     "id": 1,
     "username": "client1",
     "email": "client1@example.com",
+    "first_name": "Prénom1",
+    "last_name": "Nom1",
     "role": "CLIENT",
-    "is_active": true
+    "role_display": "Client",
+    "is_active": true,
+    "created_at": "2024-01-01T12:00:00Z"
   },
   {
     "id": 2,
     "username": "client2",
     "email": "client2@example.com",
+    "first_name": "Prénom2",
+    "last_name": "Nom2",
     "role": "CLIENT",
-    "is_active": false
+    "role_display": "Client",
+    "is_active": false,
+    "created_at": "2024-01-02T12:00:00Z"
   }
 ]
 ```
@@ -248,7 +254,8 @@ Aucun paramètre requis
 #### Paramètres du corps de requête
 ```json
 {
-  "is_active": true  // true pour valider, false pour rejeter
+  "is_active": true,        // true pour valider, false pour rejeter (requis)
+  "reason": "string"        // Raison de la validation/rejet (optionnel)
 }
 ```
 
@@ -287,11 +294,14 @@ Aucun paramètre requis
 #### Paramètres du corps de requête
 ```json
 {
-  "username": "string",      // Nom d'utilisateur (requis)
-  "email": "string",         // Adresse email (requis)
-  "password": "string",      // Mot de passe (requis)
-  "first_name": "string",    // Prénom (optionnel)
-  "last_name": "string"      // Nom de famille (optionnel)
+  "username": "string",         // Nom d'utilisateur (requis)
+  "email": "string",            // Adresse email (requis)
+  "password": "string",         // Mot de passe (requis)
+  "password_confirm": "string", // Confirmation du mot de passe (requis)
+  "first_name": "string",       // Prénom (requis)
+  "last_name": "string",        // Nom de famille (requis)
+  "phone_number": "string",     // Numéro de téléphone (optionnel)
+  "address": "string"           // Adresse (optionnel)
 }
 ```
 
