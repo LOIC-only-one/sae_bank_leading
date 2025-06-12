@@ -1,0 +1,24 @@
+# Django
+*.pyc
+__pycache__/
+/.env
+*.log
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env.*
+*.env
+
+# Migrations
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# Pytest
+.pytest_cache/
+.cache/

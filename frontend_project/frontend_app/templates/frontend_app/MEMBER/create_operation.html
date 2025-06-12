@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouvelle opération - Banque Digital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-white to-blue-100 min-h-screen font-sans">
+
+  <!-- Navigation -->
+  <nav class="bg-white/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <div class="bg-indigo-600 text-white rounded-lg h-10 w-10 flex items-center justify-center text-lg font-bold">
+            B
+          </div>
+          <span class="ml-3 text-xl font-bold text-gray-900">Banque Digital</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="{% url 'lister_comptes' %}" class="text-gray-600 hover:text-indigo-600 font-medium transition-colors">
+            Mes comptes
+          </a>
+          <a href="{% url 'dashboard' %}" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-4 py-2 rounded-lg font-medium transition-colors">
+            Tableau de bord
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenu principal -->
+  <main class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    
+    <!-- En-tête -->
+    <div class="mb-8 text-center">
+      <div class="bg-indigo-600 text-white rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold mx-auto mb-4 shadow-lg">
+        💳
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">
+        Nouvelle opération
+      </h1>
+      <p class="text-xl text-gray-600">
+        {% if type_operation %}
+          {{ type_operation|capfirst }}
+        {% else %}
+          Effectuez votre transaction en toute sécurité
+        {% endif %}
+      </p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+      <div class="mb-8 space-y-3">
+        {% for message in messages %}
+          <div class="rounded-xl p-4 shadow-md
+                      {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800
+                      {% elif message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800
+                      {% else %}bg-blue-50 border border-blue-200 text-blue-800{% endif %}">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                {% if message.tags == 'success' %}
+                  <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                {% elif message.tags == 'error' %}
+                  <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586z" clip-rule="evenodd"/>
+                  </svg>
+                {% else %}
+                  <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                  </svg>
+                {% endif %}
+              </div>
+              <div class="ml-3 font-medium">
+                {{ message }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Formulaire principal -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+      <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <!-- Type d'opération -->
+        {% if not type_operation %}
+        <div class="space-y-3">
+          <label class="block text-lg font-semibold text-gray-900">
+            <span class="flex items-center mb-3">
+              <span class="text-2xl mr-2">⚡</span>
+              Type d'opération
+            </span>
+          </label>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label class="relative cursor-pointer">
+              <input type="radio" name="type_operation" value="depot" class="sr-only peer">
+              <div class="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-6 text-center transition-all peer-checked:border-green-500 peer-checked:bg-gradient-to-br peer-checked:from-green-100 peer-checked:to-green-200 peer-checked:shadow-lg hover:shadow-md">
+                <div class="text-3xl mb-2">💰</div>
+                <div class="font-semibold text-green-800">Dépôt</div>
+                <div class="text-sm text-green-600 mt-1">Créditer votre compte</div>
+              </div>
+            </label>
+            <label class="relative cursor-pointer">
+              <input type="radio" name="type_operation" value="retrait" class="sr-only peer">
+              <div class="bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 rounded-xl p-6 text-center transition-all peer-checked:border-orange-500 peer-checked:bg-gradient-to-br peer-checked:from-orange-100 peer-checked:to-orange-200 peer-checked:shadow-lg hover:shadow-md">
+                <div class="text-3xl mb-2">💸</div>
+                <div class="font-semibold text-orange-800">Retrait</div>
+                <div class="text-sm text-orange-600 mt-1">Débiter votre compte</div>
+              </div>
+            </label>
+            <label class="relative cursor-pointer">
+              <input type="radio" name="type_operation" value="virement" class="sr-only peer">
+              <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-6 text-center transition-all peer-checked:border-blue-500 peer-checked:bg-gradient-to-br peer-checked:from-blue-100 peer-checked:to-blue-200 peer-checked:shadow-lg hover:shadow-md">
+                <div class="text-3xl mb-2">🔄</div>
+                <div class="font-semibold text-blue-800">Virement</div>
+                <div class="text-sm text-blue-600 mt-1">Transférer des fonds</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        {% else %}
+          <input type="hidden" name="type_operation" value="{{ type_operation }}">
+          <div class="bg-indigo-50 rounded-xl p-6 border border-indigo-200">
+            <div class="flex items-center justify-center">
+              <span class="text-3xl mr-3">
+                {% if type_operation == 'depot' %}💰
+                {% elif type_operation == 'retrait' %}💸
+                {% else %}🔄{% endif %}
+              </span>
+              <div>
+                <div class="text-xl font-bold text-indigo-900">{{ type_operation|capfirst }}</div>
+                <div class="text-indigo-600">Type d'opération sélectionné</div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Montant -->
+        <div class="space-y-3">
+          <label class="block text-lg font-semibold text-gray-900">
+            <span class="flex items-center mb-3">
+              <span class="text-2xl mr-2">💵</span>
+              Montant
+            </span>
+          </label>
+          <div class="relative">
+            <input type="number" name="montant" step="0.01" min="0.01" 
+                   class="w-full text-2xl font-bold text-center bg-gray-50 border-2 border-gray-200 rounded-xl py-4 px-6 focus:border-indigo-500 focus:bg-white transition-all" 
+                   placeholder="0.00" required>
+            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">€</div>
+          </div>
+        </div>
+
+        <!-- Compte de débit -->
+        {% if not compte_id %}
+        <div class="space-y-3">
+          <label class="block text-lg font-semibold text-gray-900">
+            <span class="flex items-center mb-3">
+              <span class="text-2xl mr-2">🏦</span>
+              Compte de débit
+            </span>
+          </label>
+          <select name="compte_de_debit" class="w-full bg-white border-2 border-gray-200 rounded-xl py-4 px-6 focus:border-indigo-500 transition-all" required>
+            <option value="">-- Sélectionner un compte --</option>
+            {% for compte in comptes_user %}
+              <option value="{{ compte.id }}">
+                {{ compte.numero_compte }} — {{ compte.solde|floatformat:2 }} €
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% else %}
+          <input type="hidden" name="compte_de_debit" value="{{ compte_id }}">
+        {% endif %}
+
+        <!-- Virement - Compte cible -->
+        {% if type_operation == "virement" %}
+        <div class="space-y-6 bg-blue-50 rounded-xl p-6 border border-blue-200">
+          <h3 class="text-lg font-semibold text-blue-900 flex items-center">
+            <span class="text-2xl mr-2">🎯</span>
+            Destination du virement
+          </h3>
+          
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-blue-800 mb-2">
+                Compte interne (optionnel)
+              </label>
+              <select name="compte_de_credit" class="w-full bg-white border-2 border-blue-200 rounded-xl py-3 px-4 focus:border-blue-500 transition-all">
+                <option value="">-- Sélectionner un compte interne --</option>
+                {% for compte in comptes_user %}
+                  <option value="{{ compte.id }}">
+                    {{ compte.numero_compte }} — {{ compte.solde|floatformat:2 }} €
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <div class="text-center text-blue-600 font-semibold">OU</div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-blue-800 mb-2">
+                RIB externe
+              </label>
+              <input type="text" name="rib_manuel" 
+                     class="w-full bg-white border-2 border-blue-200 rounded-xl py-3 px-4 focus:border-blue-500 transition-all font-mono" 
+                     placeholder="FR76XXXXXXXXXXXXXXXXXXXX">
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Bouton de soumission -->
+        <div class="pt-6">
+          <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-4 px-8 rounded-xl font-bold text-lg shadow-lg transition-all transform hover:scale-105 hover:shadow-xl">
+            <span class="flex items-center justify-center">
+              <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Confirmer l'opération
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Informations de sécurité -->
+    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-gray-200 mb-8">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <div class="bg-green-100 rounded-full p-2">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Sécurité garantie</h3>
+          <p class="text-gray-600">Toutes vos transactions sont sécurisées et protégées par nos systèmes de chiffrement avancés. Vos données sont traitées en toute confidentialité.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="text-center">
+      <a href="{% url 'lister_comptes' %}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-semibold transition-colors group">
+        <svg class="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Retour à mes comptes
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // Animation pour les boutons radio
+    document.addEventListener('DOMContentLoaded', function() {
+      const radioButtons = document.querySelectorAll('input[name="type_operation"]');
+      radioButtons.forEach(radio => {
+        radio.addEventListener('change', function() {
+          // Ajouter une petite animation lors du changement
+          this.parentElement.querySelector('div').style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            this.parentElement.querySelector('div').style.transform = 'scale(1)';
+          }, 150);
+        });
+      });
+
+      // Validation du montant en temps réel
+      const montantInput = document.querySelector('input[name="montant"]');
+      if (montantInput) {
+        montantInput.addEventListener('input', function() {
+          const value = parseFloat(this.value);
+          if (value > 0) {
+            this.classList.remove('border-red-300');
+            this.classList.add('border-green-300');
+          } else {
+            this.classList.remove('border-green-300');
+            this.classList.add('border-red-300');
+          }
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

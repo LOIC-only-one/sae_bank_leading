@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Comptes à valider</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-white to-blue-100 min-h-screen flex items-center justify-center font-sans">
+
+  <main class="w-full max-w-4xl bg-white/95 rounded-3xl shadow-2xl p-8 space-y-8">
+
+    <header class="text-center">
+      <h1 class="text-3xl font-bold text-indigo-700 mb-2">Comptes à valider</h1>
+      <p class="text-gray-600">Liste des comptes créés par des utilisateurs mais en attente de validation.</p>
+    </header>
+    {% if comptes %}
+    <div class="overflow-x-auto">
+      <table class="min-w-full border-separate border-spacing-y-2">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 text-left bg-indigo-600 text-white font-semibold rounded-tl-2xl">ID</th>
+            <th class="px-4 py-2 text-left bg-indigo-600 text-white font-semibold">Numéro</th>
+            <th class="px-4 py-2 text-left bg-indigo-600 text-white font-semibold">Solde</th>
+            <th class="px-4 py-2 text-left bg-indigo-600 text-white font-semibold">Création</th>
+            <th class="px-4 py-2 text-left bg-indigo-600 text-white font-semibold rounded-tr-2xl">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for compte in comptes %}
+          <tr class="bg-white shadow rounded-xl hover:shadow-md transition">
+            <td class="px-4 py-2 rounded-l-2xl border-l-4 border-indigo-300 text-indigo-800 font-bold">{{ compte.id }}</td>
+            <td class="px-4 py-2 font-mono text-indigo-900">{{ compte.numero_compte }}</td>
+            <td class="px-4 py-2 text-green-600 font-semibold">{{ compte.solde }}</td>
+            <td class="px-4 py-2 text-gray-500">{{ compte.date_creation|default:"N/A" }}</td>
+            <td class="px-4 py-2 rounded-r-2xl">
+              <form action="{% url 'valider_compte_frontend' compte.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition">
+                  ✅ Valider
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-center text-gray-500 italic">Aucun compte à valider pour le moment.</p>
+    {% endif %}
+
+    <div class="text-center">
+      <a href="{% url 'dashboard' %}" class="text-indigo-600 hover:text-indigo-800 underline font-medium">← Retour au tableau de bord</a>
+    </div>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+services:
+  mysqlbank:
+    image: mysql:8.0
+    container_name: mysqlbank
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toto
+      MYSQL_DATABASE: bank_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysqlbank:/var/lib/mysql
+      - ./init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql
+    healthcheck:
+      test: ["CMD", "mysql", "-uroot", "-ptoto", "-e", "SELECT 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    networks:
+      - backend
+
+  authservice:
+    build: ./auth_service
+    container_name: authservice
+    command: >
+      bash -c "
+      until mysqladmin ping -h mysqlbank -ptoto --silent; do
+        echo 'Waiting for MySQL...';
+        sleep 2;
+      done &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py createsuperuser --noinput --username admin --email admin@example.com &&
+      echo \"from django.contrib.auth import get_user_model; User = get_user_model(); user = User.objects.get(username='admin'); user.set_password('adminpassword'); user.save()\" | python manage.py shell &&
+      python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./auth_service:/app
+    depends_on:
+      mysqlbank:
+        condition: service_healthy
+    networks:
+      - backend
+
+  fonctservice:
+    build: ./fonct_service
+    container_name: fonctservice
+    command: >
+      bash -c "
+      until mysqladmin ping -h mysqlbank -ptoto --silent; do
+        echo 'Waiting for MySQL...';
+        sleep 2;
+      done &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8002"
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./fonct_service:/app
+    depends_on:
+      mysqlbank:
+        condition: service_healthy
+    networks:
+      - backend
+
+  loggingservice:
+    build: ./logging_service
+    container_name: loggingservice
+    command: >
+      bash -c "
+      until mysqladmin ping -h mysqlbank -ptoto --silent; do
+        echo 'Waiting for MySQL...';
+        sleep 2;
+      done &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8003"
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./logging_service:/app
+    depends_on:
+      mysqlbank:
+        condition: service_healthy
+    networks:
+      - backend
+
+  logginglistener:
+    image: python:latest
+    container_name: logginglistener
+    command: bash -c "pip install -r /app/requirements.txt && echo test && python /app/logging_api/listener.py"
+    volumes:
+      - ./logging_service:/app
+    depends_on:
+      loggingservice:
+        condition: service_started
+    networks:
+      - backend
+
+  natslogging:
+    image: nats:latest
+    container_name: natslogging
+    ports:
+      - "4222:4222"
+    command: ["-js"]
+    networks:
+      - backend
+
+  frontend:
+    build: ./frontend_project
+    container_name: frontend
+    command: >
+      bash -c "
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8001"
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./frontend_project:/app
+    environment:
+      - AUTH_API_URL=http://authservice:8000
+    depends_on:
+      - authservice
+      - fonctservice
+      - loggingservice
+    networks:
+      - backend
+
+
+volumes:
+  mysqlbank:
+
+networks:
+  backend:
+    driver: bridge

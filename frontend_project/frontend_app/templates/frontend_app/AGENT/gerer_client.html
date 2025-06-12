@@ -1,0 +1,31 @@
+<h2>Gestion des utilisateurs</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Nom</th>
+      <th>Email</th>
+      <th>Statut</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+      <tr>
+        <td>{{ user.first_name }} {{ user.last_name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</td>
+        <td>
+            <form method="post" action="{% url 'gerer_utilisateur_action' user.id %}">
+            {% csrf_token %}
+            {% if user.is_active %}
+                <button name="action" value="disable">Désactiver</button>
+            {% else %}
+                <button name="action" value="enable">Activer</button>
+            {% endif %}
+            <button name="action" value="delete">Supprimer</button>
+            </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

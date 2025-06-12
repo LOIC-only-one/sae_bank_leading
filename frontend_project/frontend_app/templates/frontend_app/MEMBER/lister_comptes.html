@@ -1,0 +1,266 @@
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Liste des comptes bancaires - {{ user.username }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-white to-blue-100 min-h-screen font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-white/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="bg-indigo-600 text-white rounded-lg h-10 w-10 flex items-center justify-center text-lg font-bold">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    <span class="ml-3 text-xl font-bold text-gray-900">Banque Digital</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">{{ user.username }}</span>
+                    <span class="bg-indigo-100 text-indigo-800 text-sm font-semibold px-3 py-1 rounded-full">
+                        {{ user.role }}
+                    </span>
+                    <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        
+        <!-- En-tête -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                Mes <span class="text-indigo-600">comptes bancaires</span>
+            </h1>
+            <p class="text-xl text-gray-600">Gérez vos comptes et effectuez vos opérations.</p>
+        </div>
+
+        <!-- Layout principal -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- Colonne principale - Liste des comptes -->
+            <div class="lg:col-span-3">
+                
+                <!-- Actions principales -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Actions rapides</h2>
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <form action="{% url 'creer_compte' %}" method="get">
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Créer un nouveau compte
+                            </button>
+                        </form>
+                        <form action="{% url 'dashboard' %}" method="get">
+                            <button type="submit" class="bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                Retour à l'accueil
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Liste des comptes -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Vos comptes bancaires</h2>
+                    
+                    {% if comptes %}
+                        <div class="space-y-4">
+                            {% for compte in comptes %}
+                            <div class="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+                                    <!-- Informations principales (ID, Numéro, Solde) -->
+                                    <div class="space-y-3">
+                                        <!-- ID -->
+                                        <div class="bg-indigo-50 rounded-xl p-4">
+                                            <div class="flex items-center mb-2">
+                                                <span class="text-lg mr-2">🆔</span>
+                                                <span class="font-semibold text-indigo-700 text-sm">ID</span>
+                                            </div>
+                                            <p class="text-lg font-bold text-gray-900">{{ compte.id }}</p>
+                                        </div>
+
+                                        <!-- Numéro de compte -->
+                                        <div class="bg-blue-50 rounded-xl p-4">
+                                            <div class="flex items-center mb-2">
+                                                <span class="text-lg mr-2">💳</span>
+                                                <span class="font-semibold text-blue-700 text-sm">Numéro</span>
+                                            </div>
+                                            <p class="text-sm font-mono text-gray-900 break-all">{{ compte.numero_compte }}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Informations financières et dates -->
+                                    <div class="space-y-3">
+                                        <!-- Solde -->
+                                        <div class="bg-green-50 rounded-xl p-4">
+                                            <div class="flex items-center mb-2">
+                                                <span class="text-lg mr-2">💰</span>
+                                                <span class="font-semibold text-green-700 text-sm">Solde</span>
+                                            </div>
+                                            <p class="text-lg font-bold text-gray-900">{{ compte.solde }} €</p>
+                                        </div>
+
+                                        <!-- Date de création -->
+                                        <div class="bg-purple-50 rounded-xl p-4">
+                                            <div class="flex items-center mb-2">
+                                                <span class="text-lg mr-2">📅</span>
+                                                <span class="font-semibold text-purple-700 text-sm">Créé le</span>
+                                            </div>
+                                            <p class="text-sm text-gray-900">{{ compte.date_creation_formatee }}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Statut et Actions -->
+                                    <div class="space-y-3">
+                                        <!-- Statut -->
+                                        <div class="bg-gray-50 rounded-xl p-4">
+                                            <div class="flex items-center mb-2">
+                                                <span class="text-lg mr-2">✅</span>
+                                                <span class="font-semibold text-gray-700 text-sm">Statut</span>
+                                            </div>
+                                            {% if compte.est_valide %}
+                                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full flex items-center w-fit">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    Validé
+                                                </span>
+                                            {% else %}
+                                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full flex items-center w-fit">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                                    </svg>
+                                                    En attente
+                                                </span>
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="bg-white rounded-xl p-4 border-2 border-gray-100">
+                                            <div class="flex items-center mb-3">
+                                                <span class="text-lg mr-2">⚡</span>
+                                                <span class="font-semibold text-gray-700 text-sm">Actions</span>
+                                            </div>
+                                            <div class="space-y-2">
+                                                {% if compte.est_valide %}
+                                                <div class="space-y-2">
+                                                    <a href="{% url 'depot_operation' compte.id %}" class="block w-full bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-semibold transition-colors text-center">
+                                                        💵 Déposer
+                                                    </a>
+                                                    <a href="{% url 'retrait_operation' compte.id %}" class="block w-full bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg text-xs font-semibold transition-colors text-center">
+                                                        💸 Retirer
+                                                    </a>
+                                                    <a href="{% url 'virement_operation' compte.id %}" class="block w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-semibold transition-colors text-center">
+                                                        🔄 Transférer
+                                                    </a>
+                                                </div>
+                                                <hr class="border-gray-200 my-3">
+                                                {% endif %}
+                                                <div class="space-y-2">
+                                                    <a href="{% url 'modifier_compte' compte.id %}" class="block w-full bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 px-3 py-2 rounded-lg text-xs font-semibold transition-colors text-center">
+                                                        ✏️ Modifier
+                                                    </a>
+                                                    <a href="{% url 'supprimer_compte' compte.id %}" class="block w-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 px-3 py-2 rounded-lg text-xs font-semibold transition-colors text-center" onclick="return confirm('Voulez-vous vraiment supprimer ce compte ?');">
+                                                        🗑️ Supprimer
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-12">
+                            <div class="bg-gray-100 rounded-full h-20 w-20 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-4xl">💳</span>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucun compte trouvé</h3>
+                            <p class="text-gray-600 mb-6">Vous n'avez pas encore de compte bancaire.</p>
+                            <form action="{% url 'creer_compte' %}" method="get" class="inline-block">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-6 rounded-xl font-semibold transition-colors shadow-md">
+                                    Créer votre premier compte
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                
+                <!-- Profil utilisateur -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="text-center">
+                        <div class="bg-indigo-600 text-white rounded-full h-20 w-20 flex items-center justify-center text-3xl font-bold mx-auto mb-4 shadow-lg">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">{{ user.username }}</h3>
+                        <p class="text-gray-600 mb-4">{{ user.email }}</p>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-sm text-gray-600 mb-1">Rôle actuel</p>
+                            <span class="bg-indigo-100 text-indigo-800 text-sm font-semibold px-3 py-1 rounded-full">
+                                {{ user.role }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistiques rapides -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="font-bold text-gray-900 mb-4">Résumé</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Comptes total :</span>
+                            <span class="font-bold text-gray-900">{{ comptes|length }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Comptes validés :</span>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">
+                                {{ nb_compte }}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">ID utilisateur :</span>
+                            <span class="font-mono text-gray-900">{{ user.id }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions rapides -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="font-bold text-gray-900 mb-4">Navigation</h3>
+                    <div class="space-y-2">
+                        <a href="{% url 'dashboard' %}" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            🏠 Tableau de bord
+                        </a>
+                        <a href="{% url 'profile' %}" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            👤 Mon profil
+                        </a>
+                        <a href="{% url 'creer_compte' %}" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            ➕ Nouveau compte
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

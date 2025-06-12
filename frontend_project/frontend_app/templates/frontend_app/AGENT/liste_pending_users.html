@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clients en attente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="mb-6">
+            <a href="{% url 'dashboard' %}" class="inline-flex items-center text-blue-600 hover:underline">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+                Retour au tableau de bord
+            </a>
+        </div>
+        
+        <h1 class="text-3xl font-bold mb-4 text-gray-800">Clients en attente de validation</h1>
+        
+        {% if count %}
+            <div class="count-info mb-6 text-lg text-gray-700">
+                <strong>{{ count }}</strong> client{{ count|pluralize }} en attente de validation
+            </div>
+        {% endif %}
+        
+        {% if pending_users and pending_users|length > 0 %}
+            <div class="grid gap-6">
+            {% for user in pending_users %}
+                <div class="user-card bg-white rounded-lg shadow p-6 flex flex-col md:flex-row md:items-center justify-between">
+                    <div class="user-info space-y-2 text-gray-700">
+                        <div><span class="font-semibold">Nom d'utilisateur:</span> {{ user.username }}</div>
+                        <div><span class="font-semibold">Email:</span> {{ user.email }}</div>
+                        <div><span class="font-semibold">Prénom:</span> {{ user.first_name }}</div>
+                        <div><span class="font-semibold">Nom:</span> {{ user.last_name }}</div>
+                        <div><span class="font-semibold">Rôle:</span> {{ user.role_display }}</div>
+                        <div><span class="font-semibold">Date d'inscription:</span> {{ user.created_at|date:"d/m/Y à H:i" }}</div>
+                        <div><span class="font-semibold">ID:</span> {{ user.id }}</div>
+                    </div>
+                    
+                    <div class="user-actions mt-4 md:mt-0 flex space-x-3">
+                        <form method="post" action="{% url 'validate_user' user.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-validate px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                                onclick="return confirm('Êtes-vous sûr de vouloir valider cet utilisateur ?')">
+                                Valider
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'reject_user' user.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-reject px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                onclick="return confirm('Êtes-vous sûr de vouloir rejeter et supprimer cet utilisateur ? Cette action est irréversible.')">
+                                Rejeter
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-users mt-12 text-center">
+                <p class="text-gray-500 text-lg">Aucun client en attente de validation.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelector('.messages');
+            if (messages) {
+                messages.style.opacity = '0';
+                messages.style.transition = 'opacity 0.5s';
+                setTimeout(() => messages.remove(), 500);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

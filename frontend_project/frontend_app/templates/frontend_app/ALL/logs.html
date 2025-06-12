@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Logs - {{ user.username }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-white to-blue-100 min-h-screen font-sans">
+
+  <!-- Navigation -->
+  <nav class="bg-white/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <div class="bg-indigo-600 text-white rounded-lg h-10 w-10 flex items-center justify-center text-lg font-bold">
+            {{ user.username|slice:":1"|upper }}
+          </div>
+          <span class="ml-3 text-xl font-bold text-gray-900">Banque Digital</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="text-gray-600">{{ user.username }}</span>
+          <span class="bg-indigo-100 text-indigo-800 text-sm font-semibold px-3 py-1 rounded-full">
+            {{ user.role }}
+          </span>
+          <a href="{% url 'dashboard' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium">Tableau de bord</a>
+          <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium">Déconnexion</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto py-8 px-4">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center">
+        <span class="text-4xl mr-3">📋</span>
+        {% if is_agent %}Analytics des Logs{% else %}Mes Logs{% endif %}
+      </h1>
+      <p class="text-xl text-gray-600">
+        {% if is_agent %}
+        Surveillance avancée et analyse des événements système
+        {% else %}
+        Historique de vos activités sur la plateforme
+        {% endif %}
+      </p>
+    </div>
+
+    {% if is_agent %}
+    <!-- Métriques principales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <p class="text-sm font-medium text-gray-600">Total Événements</p>
+        <p class="text-3xl font-bold text-gray-900">{{ analytics.total_events }}</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <p class="text-sm font-medium text-gray-600">Erreurs Critiques</p>
+        <p class="text-3xl font-bold text-red-600">{{ analytics.error_count }}</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <p class="text-sm font-medium text-gray-600">Utilisateurs Actifs (24h)</p>
+        <p class="text-3xl font-bold text-green-600">{{ analytics.active_users }}</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <p class="text-sm font-medium text-gray-600">Taux de Succès</p>
+        <p class="text-3xl font-bold text-indigo-600">
+          {% if analytics.total_events %}
+            {{ analytics.success_rate|floatformat:1 }}%
+          {% else %}0%{% endif %}
+        </p>
+      </div>
+    </div>
+
+    <!-- Filtres avancés -->
+    <form method="get" class="bg-white rounded-2xl shadow-lg p-6 mb-8 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Type d'action</label>
+          <select name="type_action" class="w-full px-4 py-2 border rounded-lg">
+            <option value="">Tous les types</option>
+            <option value="CONNEXION" {% if params.type_action == 'CONNEXION' %}selected{% endif %}>Connexion</option>
+            <option value="DECONNEXION" {% if params.type_action == 'DECONNEXION' %}selected{% endif %}>Déconnexion</option>
+            <option value="CREATION_COMPTE" {% if params.type_action == 'CREATION_COMPTE' %}selected{% endif %}>Création de compte</option>
+            <option value="VALIDATION_COMPTE" {% if params.type_action == 'VALIDATION_COMPTE' %}selected{% endif %}>Validation de compte</option>
+            <option value="REJET_COMPTE" {% if params.type_action == 'REJET_COMPTE' %}selected{% endif %}>Rejet de compte</option>
+            <option value="DEPOT" {% if params.type_action == 'DEPOT' %}selected{% endif %}>Dépôt</option>
+            <option value="RETRAIT" {% if params.type_action == 'RETRAIT' %}selected{% endif %}>Retrait</option>
+            <option value="VIREMENT" {% if params.type_action == 'VIREMENT' %}selected{% endif %}>Virement</option>
+            <option value="MISE_A_JOUR_UTILISATEUR" {% if params.type_action == 'MISE_A_JOUR_UTILISATEUR' %}selected{% endif %}>Maj utilisateur</option>
+            <option value="ERREUR_SYSTEME" {% if params.type_action == 'ERREUR_SYSTEME' %}selected{% endif %}>Erreur système</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Niveau</label>
+          <select name="level" class="w-full px-4 py-2 border rounded-lg">
+            <option value="">Tous les niveaux</option>
+            <option value="INFO" {% if params.level == 'INFO' %}selected{% endif %}>Info</option>
+            <option value="WARNING" {% if params.level == 'WARNING' %}selected{% endif %}>Warning</option>
+            <option value="ERROR" {% if params.level == 'ERROR' %}selected{% endif %}>Error</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">ID Utilisateur</label>
+          <input type="text" name="identifiant_utilisateur" value="{{ params.identifiant_utilisateur }}" class="w-full px-4 py-2 border rounded-lg" placeholder="ID utilisateur">
+        </div>
+      </div>
+      <div class="flex justify-between items-center pt-4">
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold">Analyser</button>
+        <a href="{% url 'afficher_logs' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium">Réinitialiser</a>
+      </div>
+    </form>
+
+    <!-- Top utilisateurs actifs -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+        <span class="text-xl mr-2">🏆</span>
+        Utilisateurs les plus actifs
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {% for user_id, count in analytics.top_users %}
+        <div class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-4 text-center">
+          <div class="text-2xl mb-2">{% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% else %}🥉{% endif %}</div>
+          <div class="font-bold text-gray-900">User {{ user_id }}</div>
+          <div class="text-sm text-gray-600">{{ count }} événements</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+        <span class="text-2xl mr-2">📝</span>
+        Vos activités récentes
+      </h2>
+    {% endif %}
+
+      <!-- Tableau des logs -->
+      {% if logs %}
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Heure</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Niveau</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              {% if is_agent %}
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
+              {% endif %}
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-100">
+            {% for log in logs %}
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div class="flex flex-col">
+                    {% if log.created_at_formatted %}
+                    <span class="font-medium">{{ log.created_at_formatted|slice:":10" }}</span>
+                    <span class="text-gray-500 text-xs">{{ log.created_at_formatted|slice:"11:" }}</span>
+                    {% else %}
+                    <span class="font-medium">{{ log.created_at|date:"d/m/Y" }}</span>
+                    <span class="text-gray-500 text-xs">{{ log.created_at|date:"H:i:s" }}</span>
+                    {% endif %}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-3 py-1 rounded-full text-xs font-semibold
+                  {% if log.level == 'ERROR' or log.level == 'CRITICAL' %}bg-red-100 text-red-800
+                  {% elif log.level == 'WARNING' %}bg-yellow-100 text-yellow-800
+                  {% elif log.level == 'INFO' %}bg-blue-100 text-blue-800
+                  {% elif log.level == 'DEBUG' %}bg-gray-100 text-gray-800
+                  {% else %}bg-green-100 text-green-800{% endif %}">
+                  {{ log.level }}
+                </span>
+              </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-xs font-semibold text-indigo-800">
+                  {{ log.type_action }}
+                </span>
+                </td>
+              {% if is_agent %}
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div class="flex items-center">
+                  <div class="bg-gray-100 rounded-full h-8 w-8 flex items-center justify-center text-xs font-bold text-gray-600 mr-2">
+                    <span class="font-mono">{{ log.identifiant_utilisateur }}</span>
+                  </div>
+                </div>
+              </td>
+              {% endif %}
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                <span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono">
+                  {{ log.source }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900 max-w-xs">
+                <div class="truncate" title="{{ log.message }}">
+                  {{ log.message }}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="px-6 py-12 text-center">
+        <div class="text-6xl mb-4">📝</div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun événement trouvé</h3>
+        <p class="text-gray-500">
+          {% if is_agent %}
+          Aucun log ne correspond aux critères de recherche actuels.
+          {% else %}
+          Vous n'avez pas encore d'activité enregistrée.
+          {% endif %}
+        </p>
+      </div>
+      {% endif %}
+
+    {% if not is_agent %}
+    </div>
+    {% endif %}
+  </main>
+</body>
+</html>

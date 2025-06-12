@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS auth_service_db;
+CREATE DATABASE IF NOT EXISTS fonct_service_db;
+CREATE DATABASE IF NOT EXISTS logging_service_db;

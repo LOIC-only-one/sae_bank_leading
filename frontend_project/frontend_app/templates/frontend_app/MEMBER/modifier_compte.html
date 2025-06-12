@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modification de compte</title>
+</head>
+<body>
+    <h1>Modification de compte</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="numero_compte">Numéro de compte :</label>
+        <input type="text" id="numero_compte" name="numero_compte" value="{{ compte.numero_compte }}" required>
+        <br>
+        <button type="submit">Enregistrer</button>
+    </form>
+</body>
+</html>
