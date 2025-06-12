@@ -8,11 +8,13 @@ https://www.django-rest-framework.org/tutorial/1-serialization/ = Django Rest Fr
 
 
 A fix :
+- A ajouter dans les operations a valider le client de l'utilisateur demandeur
 - A fix l'update en direct des données du profil utilisateur
-- Faire le template de la vitrine / des operations a valider / de la gestion des utilisateurs
+- Faire le template de la vitrine /  de la gestion des utilisateurs
+- A ajouter un historique de transactions pour les utilisateurs
+- A ajouter un historique de transactions pour les agents
 
 
 - Ajouter du docker swarm pour les microservices si il reste du temps ()
-- Ajouter un systeme de cache pour les microservices et eviter de devoir faire des nouveaux appels aux api endpoints ( Redis ?)
 
 https://app.mailjet.com/dashboard
