@@ -8,9 +8,8 @@ https://www.django-rest-framework.org/tutorial/1-serialization/ = Django Rest Fr
 
 
 A fix :
-- A ajouter dans les operations a valider le client de l'utilisateur demandeur
-- A fix l'update en direct des données du profil utilisateur
-- Faire le template de la vitrine /  de la gestion des utilisateurs
+- A fix la modification d'un rib pour l'utilisateur
+- Ajouter un voir les comptes bancaires pour l'agent dans la gestion des utilisateurs et le rendre fonctionnel
 - A ajouter un historique de transactions pour les utilisateurs
 - A ajouter un historique de transactions pour les agents
 

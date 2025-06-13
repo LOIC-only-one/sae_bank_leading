@@ -1,12 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Banque Digital - Accueil</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Document</title>
 </head>
-<body>
-    <p>Vous etes sur le site vitrine</p>
+<body class="bg-gradient-to-br from-indigo-100 via-white to-blue-100 min-h-screen font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-white/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="bg-indigo-600 text-white rounded-lg h-10 w-10 flex items-center justify-center text-lg font-bold">
+                        B
+                    </div>
+                    <span class="ml-3 text-xl font-bold text-gray-900">Banque Digital</span>
+                </div>
+                <div>
+                    <a href="{% url 'login' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        Se connecter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-5xl font-extrabold text-gray-900 mb-4">
+            Bienvenue sur <span class="text-indigo-600">Banque Digital</span>
+        </h1>
+        <p class="text-xl text-gray-600 mb-8">
+            La banque en ligne moderne, simple et sécurisée. Gérez vos comptes, effectuez vos opérations et profitez d’un accompagnement personnalisé.
+        </p>
+        <a href="{% url 'register' %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg transition-colors">
+            Ouvrir un compte
+        </a>
+    </section>
+
+    <!-- Features -->
+    <section class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                <div class="text-4xl mb-4">🔒</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Sécurité maximale</h3>
+                <p class="text-gray-600">Vos données et transactions sont protégées par les dernières technologies de sécurité bancaire.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                <div class="text-4xl mb-4">⚡</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Simplicité & Rapidité</h3>
+                <p class="text-gray-600">Ouvrez un compte en quelques minutes et gérez tout depuis votre espace personnel.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                <div class="text-4xl mb-4">🤝</div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Accompagnement humain</h3>
+                <p class="text-gray-600">Nos conseillers sont disponibles pour vous aider à chaque étape de votre parcours.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white/90 backdrop-blur-sm shadow-inner mt-16">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center text-gray-600">
+            <span>&copy; 2024 Banque Digital. Tous droits réservés.</span>
+            <div class="flex space-x-4 mt-2 md:mt-0">
+                <a href="#" class="hover:text-indigo-600">Mentions légales</a>
+                <a href="#" class="hover:text-indigo-600">Contact</a>
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>
