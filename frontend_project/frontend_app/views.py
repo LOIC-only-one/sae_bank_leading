@@ -340,32 +340,56 @@ def gerer_utilisateur_action_view(request, utilisateur_id):
     entetes = {'Authorization': f'Token {request.session.get("token")}'}
     action = request.POST.get("action")
 
-    reponse_compte = requests.get(f"{API_BASE_URL_FONCT}/comptes/by-user/{utilisateur_id}/", headers=entetes)
-    a_compte = reponse_compte.status_code == 200 and reponse_compte.json()
-
+    # Vérifier si l'utilisateur a des comptes
+    reponse_compte = requests.get(f"{API_BASE_URL_FONCT}/comptes/user/{utilisateur_id}/", headers=entetes)
+    a_comptes = reponse_compte.status_code == 200 and reponse_compte.json()
+    
     if action == "disable":
-        reponse = requests.post(f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/validate/", headers=entetes, json={'is_active': False})
+        reponse = requests.post(
+            f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/validate/",
+            headers=entetes,
+            json={'is_active': False}
+        )
         if reponse.status_code == 200:
             messages.success(request, "Utilisateur désactivé.")
         else:
             messages.error(request, "Erreur lors de la désactivation.")
 
     elif action == "delete":
-        if a_compte:
-            messages.error(request, "Impossible de supprimer : utilisateur a un compte bancaire.")
+        if a_comptes:
+            # Suppression de chaque compte avant suppression de l'utilisateur
+            suppression_reussie = True
+            for compte in a_comptes:
+                compte_id = compte.get("id")
+                del_response = requests.delete(f"{API_BASE_URL_FONCT}/comptes/admin-supprimer/{compte_id}/",headers=entetes)
+
+                if del_response.status_code != 204:
+                    suppression_reussie = False
+                    messages.error(request, f"Échec de suppression du compte ID {compte_id}")
+                    break
+
+            if suppression_reussie:
+                # Tous les comptes ont été supprimés, maintenant supprimer l'utilisateur
+                reponse = requests.delete(f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/reject/",headers=entetes)
+                if reponse.status_code == 204:
+                    messages.success(request, "Utilisateur et ses comptes ont été supprimés.")
+                else:
+                    messages.error(request, "Erreur lors de la suppression de l'utilisateur.")
         else:
-            reponse = requests.delete(f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/reject/", headers=entetes)
+            # Aucun compte, suppression directe
+            reponse = requests.delete(f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/reject/",headers=entetes)
             if reponse.status_code == 204:
                 messages.success(request, "Utilisateur supprimé.")
             else:
                 messages.error(request, "Erreur lors de la suppression.")
-    
+
     elif action == "enable":
-        reponse = requests.post(f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/validate/", headers=entetes, json={'is_active': True})
+        reponse = requests.post(f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/validate/",headers=entetes,json={'is_active': True})
         if reponse.status_code == 200:
             messages.success(request, "Utilisateur activé.")
         else:
             messages.error(request, "Erreur lors de l’activation.")
+    
     return redirect('gerer_utilisateur')
 
 

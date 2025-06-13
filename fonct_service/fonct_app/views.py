@@ -24,6 +24,20 @@ def lister_comptes_bancaires(request):
     serializer = ListerComptesBancairesSerializer(comptes, many=True)
     return Response(serializer.data, status=200)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def comptes_by_user(request, user_id):
+    """
+    Liste les comptes d'un utilisateur donné (réservé aux agents).
+    """
+    if 'agent' not in [r.lower() for r in getattr(request.user, 'roles', [])]:
+        return Response({"error": "Accès interdit : réservée aux agents."}, status=403)
+
+    comptes = CompteBancaire.objects.filter(proprietaire_id=user_id)
+    serializer = ListerComptesBancairesSerializer(comptes, many=True)
+    return Response(serializer.data, status=200)
+
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
