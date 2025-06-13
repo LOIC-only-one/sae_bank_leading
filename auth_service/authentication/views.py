@@ -99,6 +99,14 @@ class ProfileView(APIView):
             return Response({'message': 'Profil mis à jour', 'user': serialiseur.data})
         return Response(serialiseur.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class UserDetailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        utilisateur = get_object_or_404(Utilisateur, id=user_id)
+        serialiseur = UserListSerializer(utilisateur)
+        return Response(serialiseur.data)
 
 class UserListView(APIView):
     authentication_classes = [TokenAuthentication]

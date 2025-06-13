@@ -546,16 +546,38 @@ def creer_operation_view(request, compte_id=None):
 
 @token_required
 def lister_operations_en_attente(request):
-    ### AJOUTER L4USER QUI A FAIT LA DEMANDE
-    user = request.session.get('user', {})
-    headers = {'Authorization': f'Token {request.session["token"]}'}
-    response = requests.get(f"{API_BASE_URL_FONCT}/operations/en-attente/", headers=headers)
-    if response.status_code == 200:
-        operations = response.json()
-        return render(request, 'frontend_app/AGENT/operations_pending.html', {'operations': operations, 'user': user})
-    else:
-        messages.error(request, "Erreur lors de la récupération des opérations.")
+    utilisateur_connecte = request.session.get('user', {})
+    jeton = request.session.get('token')
+    entetes = {'Authorization': f'Token {jeton}'}
+
+    # Récupération des opérations en attente depuis fonct_service
+    reponse = requests.get(f"{API_BASE_URL_FONCT}/operations/en-attente/", headers=entetes)
+    if reponse.status_code != 200:
+        messages.error(request, "Erreur lors de la récupération des opérations en attente.")
         return redirect('dashboard')
+
+    operations_en_attente = reponse.json()
+
+    # Collecter tous les identifiants uniques des utilisateurs ayant effectué une opération
+    ids_utilisateurs = list({operation.get('effectue_par_id') for operation in operations_en_attente if operation.get('effectue_par_id')})
+
+    # Récupérer les informations des utilisateurs depuis auth_service
+    infos_utilisateurs = {}
+    for identifiant in ids_utilisateurs:
+        reponse_utilisateur = requests.get(f"{AUTH_API_URL}/api/auth/users/{identifiant}/", headers=entetes)
+        if reponse_utilisateur.status_code == 200:
+            infos_utilisateurs[identifiant] = reponse_utilisateur.json()
+
+    # Ajouter les informations utilisateurs dans chaque opération
+    for operation in operations_en_attente:
+        identifiant = operation.get('effectue_par_id')
+        operation['effectue_par'] = infos_utilisateurs.get(identifiant)
+
+    return render(request, 'frontend_app/AGENT/operations_pending.html', {
+        'operations': operations_en_attente,
+        'user': utilisateur_connecte,
+    })
+
 
 @token_required
 def valider_operation_view(request, operation_id):
