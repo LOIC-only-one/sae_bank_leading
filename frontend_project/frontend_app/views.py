@@ -286,6 +286,7 @@ def modifier_profil_view(request):
 
             if reset_response.status_code == 200:
                 messages.success(request, "Mot de passe mis à jour avec succès.")
+                send_validation_email(user_email=user_data.get('email'), message="Votre mot de passe a été changé avec succès.")
             else:
                 erreurs = reset_response.json().get('error') or reset_response.text
                 messages.error(request, f"Erreur lors du changement de mot de passe : {erreurs}")

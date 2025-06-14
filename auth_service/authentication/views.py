@@ -96,6 +96,16 @@ class ProfileView(APIView):
         serialiseur = UserProfileSerializer(requete.user, data=requete.data, partial=True)
         if serialiseur.is_valid():
             serialiseur.save()
+
+            send_log("log.membres.info", {
+                "level": "INFO",
+                "type_action": "MISE_A_JOUR_UTILISATEUR",
+                "visibilite": "MEMBRES",
+                "identifiant_utilisateur": str(requete.user.id),
+                "source": "auth_service",
+                "message": f"Profil mis à jour par {requete.user.username}."
+            })
+
             return Response({'message': 'Profil mis à jour', 'user': serialiseur.data})
         return Response(serialiseur.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -246,9 +256,18 @@ class UserDeleteView(APIView):
         utilisateur = requete.user
         if not utilisateur.role == Utilisateur.UserRoles.AGENT or utilisateur.is_superuser or utilisateur.role == Utilisateur.UserRoles.SUPER_USER:
             return Response({'error': 'Accès refusé'}, status=status.HTTP_403_FORBIDDEN)
+        
 
         cible = get_object_or_404(Utilisateur, id=user_id)
         cible.delete()
+        send_log("log.membres.info", {
+            "level": "INFO",
+            "type_action": "SUPPRESSION_COMPTE",
+            "visibilite": "AGENTS",
+            "identifiant_utilisateur": str(cible.id),
+            "source": "auth_service",
+            "message": f"Utilisateur {cible.username} supprimé par {utilisateur.username}."
+        })
         return Response({'message': 'Utilisateur supprimé'}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -291,7 +310,7 @@ class ResetPasswordView(APIView):
 
         return Response({'message': 'Mot de passe mis à jour avec succès.'}, status=status.HTTP_200_OK)
     
-    
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def validate_token(requete):
