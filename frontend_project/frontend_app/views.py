@@ -249,6 +249,9 @@ def show_profile_view(request):
     else:
         messages.error(request, "Erreur lors de la récupération de votre profil.")
         return redirect('dashboard')
+    
+
+
 @token_required
 def modifier_profil_view(request):
     headers = {'Authorization': f'Token {request.session.get("token")}'}
@@ -297,12 +300,20 @@ def modifier_profil_view(request):
             'phone_number': request.POST.get('phone_number'),
             'address': request.POST.get('address'),
         }
-        
+
+        update_response = requests.put(profil_url, json=data, headers=headers)
+
+        if update_response.status_code == 200:
+            messages.success(request, "Profil mis à jour avec succès.")
+            # Mettre à jour les infos dans la session aussi
+            updated_user = requests.get(profil_url, headers=headers).json()
+            request.session['user'] = updated_user
+        else:
+            messages.error(request, "Erreur lors de la mise à jour du profil.")
+
         return redirect('profile')
 
     return render(request, 'frontend_app/ALL/profile.html', {'user': user_data})
-
-    
 
 ############################################################################
 ############################################################################        API D'AUTHENTIFICATION
