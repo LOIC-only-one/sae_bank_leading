@@ -249,13 +249,14 @@ def show_profile_view(request):
     else:
         messages.error(request, "Erreur lors de la récupération de votre profil.")
         return redirect('dashboard')
-    
 @token_required
 def modifier_profil_view(request):
     headers = {'Authorization': f'Token {request.session.get("token")}'}
+    profil_url = f"{AUTH_API_URL}/api/auth/profile/"
+    reset_url = f"{AUTH_API_URL}/api/auth/password/reset/"
 
-    # Récupération des données du profil (toujours à jour)
-    response = requests.get(f"{AUTH_API_URL}/api/auth/profile/", headers=headers)
+    # Récupérer les infos du profil
+    response = requests.get(profil_url, headers=headers)
     if response.status_code != 200:
         messages.error(request, "Impossible de charger les données du profil.")
         return redirect('dashboard')
@@ -263,7 +264,31 @@ def modifier_profil_view(request):
     user_data = response.json()
 
     if request.method == 'POST':
-        # Données du formulaire
+        # ========== 1. Tentative de changement de mot de passe ==========
+        old_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if old_password or new_password or confirm_password:
+            if not all([old_password, new_password, confirm_password]):
+                messages.error(request, "Pour changer le mot de passe, vous devez remplir les trois champs.")
+                return redirect('profile')
+
+            reset_data = {
+                "old_password": old_password,
+                "new_password": new_password,
+                "confirm_password": confirm_password
+            }
+            reset_response = requests.post(reset_url, json=reset_data, headers=headers)
+
+            if reset_response.status_code == 200:
+                messages.success(request, "Mot de passe mis à jour avec succès.")
+            else:
+                erreurs = reset_response.json().get('error') or reset_response.text
+                messages.error(request, f"Erreur lors du changement de mot de passe : {erreurs}")
+                return redirect('profile')
+
+        # ========== 2. Mise à jour des informations personnelles ==========
         data = {
             'email': request.POST.get('email'),
             'username': request.POST.get('username'),
@@ -272,36 +297,12 @@ def modifier_profil_view(request):
             'phone_number': request.POST.get('phone_number'),
             'address': request.POST.get('address'),
         }
-
-        # Envoi de la mise à jour
-        update_response = requests.put(f"{AUTH_API_URL}/api/auth/profile/", json=data, headers=headers)
-
-        if update_response.status_code == 200:
-            messages.success(request, "Profil mis à jour avec succès.")
-            return redirect('profile')  # Rafraîchit la page pour recharger les nouvelles données
-        else:
-            messages.error(request, "Erreur lors de la mise à jour du profil.")
+        
+        return redirect('profile')
 
     return render(request, 'frontend_app/ALL/profile.html', {'user': user_data})
+
     
-@token_required
-def modifier_profil_view(request):
-    user_data = request.session.get("user", {})
-    headers = {'Authorization': f'Token {request.session.get("token")}'}
-    print(user_data)
-    if request.method == 'POST':
-        data = {'email': request.POST.get('email'),'username': request.POST.get('username'),'first_name': request.POST.get('first_name'),'last_name': request.POST.get('last_name'),'phone_number': request.POST.get('phone_number'),'address': request.POST.get('address'),}
-
-        response = requests.put(f"{AUTH_API_URL}/api/auth/profile/", json=data, headers=headers)
-        if response.status_code == 200:
-            messages.success(request, "Profil mis à jour avec succès.")
-            request.session['user'].update(response.json().get('user', {}))
-            return redirect('profile')
-        else:
-            messages.error(request, "Erreur lors de la mise à jour du profil.")
-
-    return render(request, 'frontend_app/ALL/profile.html', {'user': user_data})
-
 
 ############################################################################
 ############################################################################        API D'AUTHENTIFICATION

@@ -252,6 +252,46 @@ class UserDeleteView(APIView):
         return Response({'message': 'Utilisateur supprimé'}, status=status.HTTP_204_NO_CONTENT)
 
 
+
+class ResetPasswordView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        utilisateur = request.user
+        ancien_mdp = request.data.get('old_password')
+        nouveau_mdp = request.data.get('new_password')
+        confirm_mdp = request.data.get('confirm_password')
+
+        if not ancien_mdp or not nouveau_mdp or not confirm_mdp:
+            return Response({'error': 'Les champs "old_password", "new_password" et "confirm_password" sont requis.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not utilisateur.check_password(ancien_mdp):
+            return Response({'error': 'L’ancien mot de passe est incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if nouveau_mdp != confirm_mdp:
+            return Response({'error': 'Les nouveaux mots de passe ne correspondent pas.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            validate_password(nouveau_mdp, utilisateur)
+        except Exception as erreur:
+            return Response({'error': str(erreur)}, status=status.HTTP_400_BAD_REQUEST)
+
+        utilisateur.set_password(nouveau_mdp)
+        utilisateur.save()
+
+        send_log("log.membres.info", {
+            "level": "INFO",
+            "type_action": "MISE_A_JOUR_UTILISATEUR",
+            "visibilite": "MEMBRES",
+            "identifiant_utilisateur": str(utilisateur.id),
+            "source": "auth_service",
+            "message": f"Mot de passe modifié par {utilisateur.username}."
+        })
+
+        return Response({'message': 'Mot de passe mis à jour avec succès.'}, status=status.HTTP_200_OK)
+    
+    
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def validate_token(requete):
@@ -261,3 +301,4 @@ def validate_token(requete):
         "username": requete.user.username,
         "role": getattr(requete.user, "role", None)
     })
+

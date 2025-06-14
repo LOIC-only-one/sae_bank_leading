@@ -1,11 +1,12 @@
 from django.urls import path
-from authentication.views import RegisterView, UserDetailView, LoginView, ProfileView, UserListView, UserValidationView, PendingUsersView, logout_view, AgentCreateView, UserDeleteView, validate_token
+from authentication.views import RegisterView, UserDetailView, ResetPasswordView, LoginView, ProfileView, UserListView, UserValidationView, PendingUsersView, logout_view, AgentCreateView, UserDeleteView, validate_token
 urlpatterns = [
     # ===== AUTHENTIFICATION =====
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', logout_view, name='logout'),
-    
+    path('password/reset/', ResetPasswordView.as_view(), name='password_reset'),
+
     # ===== PROFIL UTILISATEUR =====
     path('profile/', ProfileView.as_view(), name='profile'),
 
