@@ -22,6 +22,8 @@ from .views import (
     modifier_profil_view,
     gerer_utilisateur_view,
     gerer_utilisateur_action_view,
+    modifier_rib_view,
+    voir_comptes_utilisateur_view,
 )
 
 urlpatterns = [
@@ -43,13 +45,14 @@ urlpatterns = [
     path('client/profile/', modifier_profil_view, name='profile'),
     path('agent/gerer-utilisateurs/', gerer_utilisateur_view, name='gerer_utilisateur'),
     path('agent/gerer-utilisateur/<int:utilisateur_id>/', gerer_utilisateur_action_view, name='gerer_utilisateur_action'),
+    path('agent/utilisateur/<int:utilisateur_id>/comptes/', voir_comptes_utilisateur_view, name='voir_comptes_utilisateur'),
 
 
     #### Gestion des comptes bancaires pour un utilisateur connecté (client) (FAIT)
     path('comptes/', lister_comptes, name='lister_comptes'),                                   
     path('comptes/creer/', creer_compte, name='creer_compte'),
     path('comptes/supprimer/<int:compte_id>/', supprimer_compte, name='supprimer_compte'),
-    path('comptes/update/<int:compte_id>/', supprimer_compte, name='modifier_compte'),
+    path('comptes/modifier/<int:compte_id>/', modifier_rib_view, name='modifier_rib'),
     path('comptes/<int:compte_id>/depot/', creer_operation_view, name='depot_operation'),
     path('comptes/<int:compte_id>/retrait/', creer_operation_view, name='retrait_operation'),
     path('comptes/<int:compte_id>/virement/', creer_operation_view, name='virement_operation'),

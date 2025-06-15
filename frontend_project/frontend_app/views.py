@@ -488,6 +488,32 @@ def supprimer_compte(request, compte_id):
     return redirect('lister_comptes')
 
 @token_required
+@require_http_methods(["POST"])
+def modifier_rib_view(request, compte_id):
+    nouveau_rib = request.POST.get("nouveau_rib")
+    if not nouveau_rib:
+        messages.error(request, "Veuillez fournir un nouveau RIB.")
+        return redirect('lister_comptes')
+
+    user = request.session.get("user", {})
+    headers = {'Authorization': f'Token {request.session.get("token")}'}
+    data = {
+        'numero_compte': nouveau_rib,
+        'proprietaire_id': user.get('id')
+    }
+
+    response = requests.put(f"{API_BASE_URL_FONCT}/comptes/modifier/{compte_id}/", json=data, headers=headers)
+
+    if response.status_code == 200:
+        messages.success(request, "RIB mis à jour avec succès.")
+    else:
+        erreur = response.json()
+        messages.error(request, f"Erreur lors de la mise à jour du RIB : {erreur}")
+
+    return redirect('lister_comptes')
+
+
+@token_required
 @require_http_methods(["GET", "POST"])
 def creer_operation_view(request, compte_id=None):
     """
@@ -747,3 +773,27 @@ def afficher_logs_view(request):
         'analytics': statistiques if est_agent else {},
     })
 
+
+@token_required
+def voir_comptes_utilisateur_view(request, utilisateur_id):
+    headers = {'Authorization': f'Token {request.session.get("token")}'}
+    user = request.session.get("user")
+
+    if user.get("role") != "AGENT":
+        messages.error(request, "Accès interdit.")
+        return redirect("dashboard")
+
+    response = requests.get(f"{API_BASE_URL_FONCT}/comptes/user/{utilisateur_id}/", headers=headers)
+
+    if response.status_code == 200:
+        comptes = response.json()
+        for compte in comptes:
+            compte['date_creation_formatee'] = datetime.fromisoformat(compte['date_creation'].replace("Z", "")).strftime("%d/%m/%Y %H:%M")
+    else:
+        comptes = []
+        messages.error(request, f"Erreur lors de la récupération des comptes (status {response.status_code})")
+
+    return render(request, "frontend_app/AGENT/voir_comptes_client.html", {
+        "comptes": comptes,
+        "utilisateur_id": utilisateur_id
+    })

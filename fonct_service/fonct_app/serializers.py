@@ -33,23 +33,12 @@ class InteractWithCompteBancaireSerializer(serializers.ModelSerializer):
         fields = ['proprietaire_id', 'numero_compte', 'est_valide']
         read_only_fields = ['id', 'date_creation', 'solde']
     
-    def validate_numero_compte(self, value):
-        if not value:
-            raise serializers.ValidationError("Le numéro de compte est obligatoire.")
-            
-        if CompteBancaire.objects.filter(numero_compte=value).exists():
-            raise serializers.ValidationError("Le numéro de compte existe déjà.")
-        return value
-    
     def validate_proprietaire_id(self, value):
-        # Validation du proprietaire_id
         if not value:
             raise serializers.ValidationError("Le proprietaire_id est obligatoire.")
         return value
     
     def validate(self, data):
-        """Validation globale des données"""
-        # S'assurer que tous les champs obligatoires sont présents
         if not data.get('proprietaire_id'):
             raise serializers.ValidationError({
                 'proprietaire_id': ['This field is required.']
@@ -61,7 +50,7 @@ class InteractWithCompteBancaireSerializer(serializers.ModelSerializer):
             })
             
         return data
-    
+
     def create(self, validated_data):
         return CompteBancaire.objects.create(**validated_data)
     
@@ -88,6 +77,7 @@ class InteractWithCompteBancaireSerializer(serializers.ModelSerializer):
     def delete(self, instance):
         instance.delete()
         return None
+
 
 class ListerComptesBancairesSerializer(serializers.ModelSerializer):
     """Permet à chaque utilisateur de lister ses comptes bancaires"""

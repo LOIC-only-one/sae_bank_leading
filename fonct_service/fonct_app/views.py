@@ -432,3 +432,37 @@ def supprimer_compte_admin(request, compte_id):
         return Response({"message": "Compte supprimé avec succès."}, status=204)
     except CompteBancaire.DoesNotExist:
         return Response({"error": "Compte introuvable."}, status=404)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def modifier_compte(request, compte_id):
+    try:
+        compte = CompteBancaire.objects.get(id=compte_id, proprietaire_id=request.user.id)
+    except CompteBancaire.DoesNotExist:
+        return Response({'error': 'Compte non trouvé'}, status=404)
+
+    serializer = InteractWithCompteBancaireSerializer(compte, data=request.data, partial=True)
+
+    if serializer.is_valid():
+        compte_modifie = serializer.save()
+        # Ajout du log
+        send_log("log.membres.info", {
+            "level": "INFO",
+            "type_action": "COMPTE",
+            "visibilite": "AGENTS",
+            "identifiant_utilisateur": str(compte.proprietaire_id),
+            "source": "fonct_service",
+            "message": f"Modification du compte bancaire {compte_id} par l'agent {request.user.username} (id={request.user.id})."
+        })
+        return Response(AfficheCompteBancaireSerializer(compte_modifie).data, status=200)
+    else:
+        send_log("log.membres.info", {
+            "level": "ERROR",
+            "type_action": "COMPTE",
+            "visibilite": "AGENTS",
+            "identifiant_utilisateur": str(compte.proprietaire_id),
+            "source": "fonct_service",
+            "message": f"Erreur de validation lors de la modification du compte bancaire {compte_id} par l'agent {request.user.username} (id={request.user.id}): {serializer.errors}"
+        })
+        return Response(serializer.errors, status=400)

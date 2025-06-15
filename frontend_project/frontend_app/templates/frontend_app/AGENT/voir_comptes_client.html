@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Comptes bancaires de l'utilisateur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ajoutez ici vos liens CSS, par exemple Tailwind CDN si nécessaire -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white/90 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="bg-indigo-600 text-white rounded-lg h-10 w-10 flex items-center justify-center text-lg font-bold">
+                        A
+                    </div>
+                    <span class="ml-3 text-xl font-bold text-gray-900">Banque Digital</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        Déconnexion
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                      Tableau de bord
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="max-w-5xl mx-auto py-8 px-4">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Comptes bancaires de l'utilisateur #{{ utilisateur_id }}</h1>
+        
+        <a href="{% url 'gerer_utilisateur' %}" class="text-indigo-600 hover:underline mb-4 inline-block">← Retour à la liste des utilisateurs</a>
+
+        {% if comptes %}
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Numéro de compte</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Solde</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date de création</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Validé ?</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for compte in comptes %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ compte.numero_compte }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ compte.solde }} €</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ compte.date_creation_formatee }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    {% if compte.est_valide %}
+                                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Oui</span>
+                                    {% else %}
+                                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Non</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-gray-600">Aucun compte bancaire trouvé pour cet utilisateur.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

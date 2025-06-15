@@ -124,6 +124,8 @@ services:
       - ./frontend_project:/app
     environment:
       - AUTH_API_URL=http://authservice:8000
+      - FONCT_API_URL=http://fonctservice:8002
+      - LOGGING_API_URL=http://loggingservice:8003
     depends_on:
       - authservice
       - fonctservice
