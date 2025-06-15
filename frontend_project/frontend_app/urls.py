@@ -1,30 +1,5 @@
 from django.urls import path
-from .views import (
-    login_view,
-    logout_view,
-    vitrine_view,
-    dashboard_view,
-    register_view,
-    create_agent_view,
-    pending_clients_view,
-    validate_user_view,
-    reject_user_view,
-    lister_comptes,
-    creer_compte,
-    supprimer_compte,
-    creer_operation_view,
-    comptes_en_attente_view,
-    valider_compte_view,
-    lister_operations_en_attente,
-    valider_operation_view,
-    rejeter_operation_view,
-    afficher_logs_view,
-    modifier_profil_view,
-    gerer_utilisateur_view,
-    gerer_utilisateur_action_view,
-    modifier_rib_view,
-    voir_comptes_utilisateur_view,
-)
+from .views import login_view, logout_view, vitrine_view, dashboard_view, register_view, create_agent_view, pending_clients_view, validate_user_view, reject_user_view, lister_comptes, creer_compte, supprimer_compte, creer_operation_view, comptes_en_attente_view, valider_compte_view, lister_operations_en_attente, valider_operation_view, rejeter_operation_view, afficher_logs_view, modifier_profil_view, gerer_utilisateur_view, gerer_utilisateur_action_view, modifier_rib_view, voir_comptes_utilisateur_view
 
 urlpatterns = [
 
@@ -47,7 +22,6 @@ urlpatterns = [
     path('agent/gerer-utilisateur/<int:utilisateur_id>/', gerer_utilisateur_action_view, name='gerer_utilisateur_action'),
     path('agent/utilisateur/<int:utilisateur_id>/comptes/', voir_comptes_utilisateur_view, name='voir_comptes_utilisateur'),
 
-
     #### Gestion des comptes bancaires pour un utilisateur connecté (client) (FAIT)
     path('comptes/', lister_comptes, name='lister_comptes'),                                   
     path('comptes/creer/', creer_compte, name='creer_compte'),
@@ -57,11 +31,10 @@ urlpatterns = [
     path('comptes/<int:compte_id>/retrait/', creer_operation_view, name='retrait_operation'),
     path('comptes/<int:compte_id>/virement/', creer_operation_view, name='virement_operation'),
 
-    ### Gestion des comptes bancaires pour les agents (PAS FAIT OU JE SAIS PAS)
+    ### Gestion des comptes bancaires pour les agents (FAIT)
     path('bank/pending/', creer_compte, name='pending_accounts'),
     path('bank/comptes-en-attente/', comptes_en_attente_view, name='comptes_en_attente'),
     path('bank/valider/<int:compte_id>/', valider_compte_view, name='valider_compte_frontend'),
-    # Ajouter une vue pour rejeter un compte bancaire en attente si nécessaire
 
     ### Validation des opérations bancaires par les agents
     path('operations/en-attente/', lister_operations_en_attente, name='lister_operations'),
@@ -69,8 +42,7 @@ urlpatterns = [
     path('operations/valider/<int:operation_id>/', valider_operation_view, name='valider_operation'),
     path('operations/rejeter/<int:operation_id>/', rejeter_operation_view, name='rejeter_operation'),
 
-
-
+    #### Affichage des logs (FAIT)
     path('logs/', afficher_logs_view, name='afficher_logs'),
 
 

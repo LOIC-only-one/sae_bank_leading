@@ -9,16 +9,7 @@ class AfficheCompteBancaireSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CompteBancaire
-        fields = [
-            'id',
-            'proprietaire_id',
-            'proprietaire_display',
-            'numero_compte',
-            'solde',
-            'argent',              
-            'date_creation',
-            'est_valide',
-        ]
+        fields = ['id','proprietaire_id','proprietaire_display','numero_compte','solde','argent','date_creation','est_valide',]
         read_only_fields = ['id', 'date_creation', 'solde']
     
     def get_argent(self, obj):

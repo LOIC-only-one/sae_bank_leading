@@ -6,14 +6,13 @@ from datetime import datetime
 from collections import Counter
 from datetime import datetime, timedelta
 from .utils import send_validation_email
-from .log import log_nats
-############################################################################
-############################################################################        API D'AUTHENTIFICATION
-############################################################################
-
 import os
+
+
 AUTH_API_URL = os.getenv("AUTH_API_URL", "http://authservice:8000")
 LOGGING_API_URL = os.getenv("LOGGING_API_URL", "http://loggingservice:8003")
+API_BASE_URL_FONCT = "http://fonctservice:8002/api"
+
 
 
 def token_required(view_func):
@@ -72,6 +71,79 @@ def dashboard_view(request):
     return render(request, 'frontend_app/home.html', {'user': user, 'historique': liste_logs_transaction_historian})
 
 
+@token_required
+def modifier_profil_view(request):
+    headers = {'Authorization': f'Token {request.session.get("token")}'}
+    profil_url = f"{AUTH_API_URL}/api/auth/profile/"
+    reset_url = f"{AUTH_API_URL}/api/auth/password/reset/"
+
+    response = requests.get(profil_url, headers=headers)
+    if response.status_code != 200:
+        messages.error(request, "Impossible de charger les données du profil.")
+        return redirect('dashboard')
+
+    user_data = response.json()
+
+    if request.method == 'POST':
+        old_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if old_password or new_password or confirm_password:
+            if not all([old_password, new_password, confirm_password]):
+                messages.error(request, "Pour changer le mot de passe, vous devez remplir les trois champs.")
+                return redirect('profile')
+
+            reset_data = {
+                "old_password": old_password,
+                "new_password": new_password,
+                "confirm_password": confirm_password
+            }
+            reset_response = requests.post(reset_url, json=reset_data, headers=headers)
+
+            if reset_response.status_code == 200:
+                messages.success(request, "Mot de passe mis à jour avec succès.")
+                send_validation_email(user_email=user_data.get('email'), message="Votre mot de passe a été changé avec succès.")
+            else:
+                erreurs = reset_response.json().get('error') or reset_response.text
+                messages.error(request, f"Erreur lors du changement de mot de passe : {erreurs}")
+                return redirect('profile')
+
+        data = {
+            'email': request.POST.get('email'),
+            'username': request.POST.get('username'),
+            'first_name': request.POST.get('first_name'),
+            'last_name': request.POST.get('last_name'),
+            'phone_number': request.POST.get('phone_number'),
+            'address': request.POST.get('address'),
+        }
+
+        update_response = requests.put(profil_url, json=data, headers=headers)
+
+        if update_response.status_code == 200:
+            messages.success(request, "Profil mis à jour avec succès.")
+            updated_user = requests.get(profil_url, headers=headers).json()
+            request.session['user'] = updated_user
+        else:
+            messages.error(request, "Erreur lors de la mise à jour du profil.")
+
+        return redirect('profile')
+
+    return render(request, 'frontend_app/ALL/profile.html', {'user': user_data})
+
+@token_required
+def show_profile_view(request):
+    headers = {'Authorization': f"Token {request.session.get('token')}"}
+    response = requests.get(f"{AUTH_API_URL}/api/auth/profile/", headers=headers)
+    if response.status_code == 200:
+        user_data = response.json(); request.session['user'] = user_data
+        return render(request, 'frontend_app/ALL/profile.html', {'user': user_data})
+    else:
+        messages.error(request, "Erreur lors de la récupération de votre profil.")
+        return redirect('dashboard')
+    
+
+# ----------- Authentification et Inscription -----------
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -112,7 +184,6 @@ def register_view(request):
         })
 
         if response.status_code == 201:
-            # Envoi du mail de confirmation d'inscription
             user_data = response.json().get('user', {})
             user_email = user_data.get('email', email)
             if user_email:
@@ -135,25 +206,8 @@ def logout_view(request):
     messages.success(request, "Vous avez été déconnecté avec succès.")
     return redirect('login')
 
-    
-@token_required
-def password_reset_view(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
 
-        response = requests.post(f"{AUTH_API_URL}/api/auth/password-reset/", json={
-            'email': email
-        })
-
-        if response.status_code == 200:
-            messages.success(request, "Un e-mail de réinitialisation du mot de passe a été envoyé.")
-            return redirect('login')
-        else:
-            messages.error(request, "Erreur lors de la demande de réinitialisation du mot de passe.")
-
-    return render(request, 'frontend_app/password_reset.html')
-
-
+# ----------- Gestion des Agents par les Super Utilisateurs -----------
 @token_required
 def create_agent_view(request):
     if request.method == 'POST':
@@ -183,6 +237,8 @@ def create_agent_view(request):
         return render(request, 'frontend_app/SUPER_USER/create_agent.html')
 
 
+
+# ----------- Gestion des Clients en Attente (Agents) -----------
 @token_required
 def pending_clients_view(request):
     headers = {'Authorization': f"Token {request.session.get('token')}"}
@@ -201,7 +257,6 @@ def pending_clients_view(request):
 
 @token_required
 def validate_user_view(request, user_id):
-    """Valider un utilisateur (activer son compte)"""
     user = request.session.get('user', {})
     if request.method == 'POST':
         headers = {'Authorization': f"Token {request.session.get('token')}"}
@@ -230,7 +285,6 @@ def validate_user_view(request, user_id):
 
 @token_required
 def reject_user_view(request, user_id):
-    """Rejeter un utilisateur (supprimer son compte)"""
     user = request.session.get('user', {})
     if request.method == 'POST':
         headers = {'Authorization': f"Token {request.session.get('token')}"}
@@ -253,7 +307,6 @@ def reject_user_view(request, user_id):
 
 @token_required
 def deactivate_user_view(request, user_id):
-    """Désactiver un utilisateur sans le supprimer"""
     user = request.session.get('user', {})
     if request.method == 'POST':
         headers = {'Authorization': f"Token {request.session.get('token')}"}
@@ -275,96 +328,6 @@ def deactivate_user_view(request, user_id):
         else:
             messages.error(request, f"Erreur lors de la désactivation: {response.json()}")
     return redirect('pending_clients')
-
-
-@token_required
-def show_profile_view(request):
-    """Afficher le profil de l'utilisateur connecté et rafraîchir les données en session"""
-    headers = {'Authorization': f"Token {request.session.get('token')}"}
-    response = requests.get(f"{AUTH_API_URL}/api/auth/profile/", headers=headers)
-    if response.status_code == 200:
-        user_data = response.json(); request.session['user'] = user_data
-        return render(request, 'frontend_app/ALL/profile.html', {'user': user_data})
-    else:
-        messages.error(request, "Erreur lors de la récupération de votre profil.")
-        return redirect('dashboard')
-    
-
-
-@token_required
-def modifier_profil_view(request):
-    headers = {'Authorization': f'Token {request.session.get("token")}'}
-    profil_url = f"{AUTH_API_URL}/api/auth/profile/"
-    reset_url = f"{AUTH_API_URL}/api/auth/password/reset/"
-
-    # Récupérer les infos du profil
-    response = requests.get(profil_url, headers=headers)
-    if response.status_code != 200:
-        messages.error(request, "Impossible de charger les données du profil.")
-        return redirect('dashboard')
-
-    user_data = response.json()
-
-    if request.method == 'POST':
-        # ========== 1. Tentative de changement de mot de passe ==========
-        old_password = request.POST.get("old_password")
-        new_password = request.POST.get("new_password")
-        confirm_password = request.POST.get("confirm_password")
-
-        if old_password or new_password or confirm_password:
-            if not all([old_password, new_password, confirm_password]):
-                messages.error(request, "Pour changer le mot de passe, vous devez remplir les trois champs.")
-                return redirect('profile')
-
-            reset_data = {
-                "old_password": old_password,
-                "new_password": new_password,
-                "confirm_password": confirm_password
-            }
-            reset_response = requests.post(reset_url, json=reset_data, headers=headers)
-
-            if reset_response.status_code == 200:
-                messages.success(request, "Mot de passe mis à jour avec succès.")
-                send_validation_email(user_email=user_data.get('email'), message="Votre mot de passe a été changé avec succès.")
-            else:
-                erreurs = reset_response.json().get('error') or reset_response.text
-                messages.error(request, f"Erreur lors du changement de mot de passe : {erreurs}")
-                return redirect('profile')
-
-        # ========== 2. Mise à jour des informations personnelles ==========
-        data = {
-            'email': request.POST.get('email'),
-            'username': request.POST.get('username'),
-            'first_name': request.POST.get('first_name'),
-            'last_name': request.POST.get('last_name'),
-            'phone_number': request.POST.get('phone_number'),
-            'address': request.POST.get('address'),
-        }
-
-        update_response = requests.put(profil_url, json=data, headers=headers)
-
-        if update_response.status_code == 200:
-            messages.success(request, "Profil mis à jour avec succès.")
-            # Mettre à jour les infos dans la session aussi
-            updated_user = requests.get(profil_url, headers=headers).json()
-            request.session['user'] = updated_user
-        else:
-            messages.error(request, "Erreur lors de la mise à jour du profil.")
-
-        return redirect('profile')
-
-    return render(request, 'frontend_app/ALL/profile.html', {'user': user_data})
-
-############################################################################
-############################################################################        API D'AUTHENTIFICATION
-############################################################################
-
-
-############################################################################
-############################################################################        API DE GESTION DES COMPTES
-############################################################################
-
-API_BASE_URL_FONCT = "http://fonctservice:8002/api"
 
 @token_required
 def gerer_utilisateur_view(request):
@@ -392,7 +355,6 @@ def gerer_utilisateur_action_view(request, utilisateur_id):
     entetes = {'Authorization': f'Token {request.session.get("token")}'}
     action = request.POST.get("action")
 
-    # Vérifier si l'utilisateur a des comptes
     reponse_compte = requests.get(f"{API_BASE_URL_FONCT}/comptes/user/{utilisateur_id}/", headers=entetes)
     a_comptes = reponse_compte.status_code == 200 and reponse_compte.json()
     
@@ -421,14 +383,12 @@ def gerer_utilisateur_action_view(request, utilisateur_id):
                     break
 
             if suppression_reussie:
-                # Tous les comptes ont été supprimés, maintenant supprimer l'utilisateur
                 reponse = requests.delete(f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/reject/",headers=entetes)
                 if reponse.status_code == 204:
                     messages.success(request, "Utilisateur et ses comptes ont été supprimés.")
                 else:
                     messages.error(request, "Erreur lors de la suppression de l'utilisateur.")
         else:
-            # Aucun compte, suppression directe
             reponse = requests.delete(f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/reject/",headers=entetes)
             if reponse.status_code == 204:
                 messages.success(request, "Utilisateur supprimé.")
@@ -445,6 +405,7 @@ def gerer_utilisateur_action_view(request, utilisateur_id):
     return redirect('gerer_utilisateur')
 
 
+# ----------- Gestion des Comptes (Membre) -----------
 @token_required
 def lister_comptes(request):
     token = request.session.get('token')
@@ -452,9 +413,7 @@ def lister_comptes(request):
         messages.error(request, "Vous devez être connecté.")
         return redirect('login')
     
-    headers = {
-        'Authorization': f"Token {token}"
-    }
+    headers = {'Authorization': f"Token {token}"}
     
     response = requests.get(f'{API_BASE_URL_FONCT}/comptes/', headers=headers)
     
@@ -481,8 +440,6 @@ def creer_compte(request):
         return redirect('login')
     
     token = request.session.get('token')
-    user = request.session.get('user', {})
-    log_url = "http://loggingservice:8003/logs/create/"
     
     if request.method == 'POST':
         numero_compte = request.POST.get('numero_compte')
@@ -491,15 +448,9 @@ def creer_compte(request):
         if not numero_compte:
             return render(request, 'frontend_app/MEMBER/creer_compte.html')
         
-        data = {
-            "numero_compte": numero_compte,
-            "est_valide": bool(est_valide)
-        }
+        data = {"numero_compte": numero_compte,"est_valide": bool(est_valide)}
         
-        headers = {
-            'Authorization': f"Token {token}",
-            'Content-Type': 'application/json'
-        }
+        headers = {'Authorization': f"Token {token}",'Content-Type': 'application/json'}
         
         response = requests.post(f"{API_BASE_URL_FONCT}/comptes/creer/", json=data, headers=headers)
 
@@ -536,10 +487,7 @@ def modifier_rib_view(request, compte_id):
 
     user = request.session.get("user", {})
     headers = {'Authorization': f'Token {request.session.get("token")}'}
-    data = {
-        'numero_compte': nouveau_rib,
-        'proprietaire_id': user.get('id')
-    }
+    data = {'numero_compte': nouveau_rib,'proprietaire_id': user.get('id')}
 
     response = requests.put(f"{API_BASE_URL_FONCT}/comptes/modifier/{compte_id}/", json=data, headers=headers)
 
@@ -614,13 +562,10 @@ def creer_operation_view(request, compte_id=None):
         else:
             messages.error(request, f"Erreur: {response.text}")
 
-    return render(request, 'frontend_app/MEMBER/create_operation.html', {
-        'type_operation': type_from_url,
-        'compte_id': compte_id,
-        'comptes_user': comptes_user
-    })
+    return render(request, 'frontend_app/MEMBER/create_operation.html', {'type_operation': type_from_url,'compte_id': compte_id,'comptes_user': comptes_user})
 
 
+# ----------- Gestion des Opérations en Attente (Agents) -----------
 
 @token_required
 def lister_operations_en_attente(request):
@@ -706,9 +651,9 @@ def valider_compte_view(request, compte_id):
             messages.error(request, f"Erreur lors de la validation : {response.text}")
     return redirect('comptes_en_attente')
 
-############################################################################
-############################################################################        API DE GESTION DES COMPTES
-############################################################################
+
+# ----------- Gestion des Logs (Agents + Membres) -----------
+
 @token_required
 def afficher_logs_view(request):
     utilisateur = request.session.get('user')
@@ -812,6 +757,7 @@ def afficher_logs_view(request):
         'analytics': statistiques if est_agent else {},
     })
 
+# ----------- Gestion des Comptes Utilisateur (Agents) -----------
 
 @token_required
 def voir_comptes_utilisateur_view(request, utilisateur_id):
