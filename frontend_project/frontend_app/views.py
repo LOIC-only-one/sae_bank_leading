@@ -13,6 +13,7 @@ from .log import log_nats
 
 import os
 AUTH_API_URL = os.getenv("AUTH_API_URL", "http://authservice:8000")
+LOGGING_API_URL = os.getenv("LOGGING_API_URL", "http://loggingservice:8003")
 
 
 def token_required(view_func):
@@ -29,8 +30,46 @@ def vitrine_view(request):
 
 @token_required
 def dashboard_view(request):
-    user = request.session.get('user')
-    return render(request, 'frontend_app/home.html', {'user': user})
+    headers = {'Authorization': f'Token {request.session.get("token")}'}
+    user = request.session.get('user', {})
+    liste_logs_transaction_historian = []
+
+    comptes_response = requests.get(f"{API_BASE_URL_FONCT}/comptes/", headers=headers)
+    comptes = comptes_response.json() if comptes_response.status_code == 200 else []
+
+    response = requests.get(f'{LOGGING_API_URL}/logs/', headers=headers)
+    if response.status_code == 200:
+        logs = response.json()
+        OPERATION_TYPES = {
+            'VIREMENT': 'Virement',
+            'DEPOT': 'Dépôt',
+            'RETRAIT': 'Retrait',
+            'OPERATION': 'Opération bancaire',
+            'TRANSFERT': 'Transfert',
+        }
+        for log in logs:
+            type_action = log.get('type_action')
+            if (log.get('identifiant_utilisateur') == user.get('id') and type_action in OPERATION_TYPES):
+                compte_id = log.get('compte_id')
+                rib = None
+                for compte in comptes:
+                    if compte.get('id') == compte_id:
+                        rib = compte.get('numero_compte')
+                        break
+
+                date_formatee = log['created_at']
+                if log.get('created_at'):
+                    date_formatee = datetime.fromisoformat(log['created_at'].replace("Z", "+00:00")).strftime("%d/%m/%Y %H:%M:%S")
+                liste_logs_transaction_historian.append({
+                    'date': date_formatee,
+                    'rib': rib,
+                    'montant': log.get('montant'),
+                    'type_operation': OPERATION_TYPES.get(type_action, type_action),
+                    'statut': log.get('level'),
+                    'details': log.get('message'),
+                })
+
+    return render(request, 'frontend_app/home.html', {'user': user, 'historique': liste_logs_transaction_historian})
 
 
 def login_view(request):
@@ -96,7 +135,7 @@ def logout_view(request):
     messages.success(request, "Vous avez été déconnecté avec succès.")
     return redirect('login')
 
-#### PAS IMPLEMENTÉ POUR LE MOMENT
+    
 @token_required
 def password_reset_view(request):
     if request.method == 'POST':
