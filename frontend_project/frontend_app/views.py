@@ -782,6 +782,7 @@ def afficher_logs_view(request):
         'user': utilisateur,
         'params': parametres,
         'analytics': statistiques if est_agent else {},
+        'logs': liste_logs,
     })
 
 # ----------- Gestion des Comptes Utilisateur (Agents) -----------

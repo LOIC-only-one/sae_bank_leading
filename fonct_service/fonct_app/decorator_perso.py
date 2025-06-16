@@ -19,8 +19,6 @@ class RemoteUser:
         return self.username
 
 class RemoteTokenAuthentication(BaseAuthentication):
-    """Authentication backend pour valider les tokens d'authentification
-    en interrogeant un service distant. ENTRE AUTH API ET FONCT API"""
     def authenticate(self, request):
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Token '):
