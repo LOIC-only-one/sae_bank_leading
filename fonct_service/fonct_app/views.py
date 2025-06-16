@@ -5,10 +5,9 @@ from datetime import datetime
 from .models import CompteBancaire, OperationBancaire
 from .serializers import ListerComptesBancairesSerializer, InteractWithCompteBancaireSerializer, AfficheCompteBancaireSerializer, OperationBancaireSerializer
 from .logging import send_log
+from .decorator_perso import agent_required
 
-# ==============================
-#      COMPTES BANCAIRES - CLIENT
-# ==============================
+# ------------ VUES POUR LA GESTION DES COMPTES BANCAIRES ------------
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -21,14 +20,12 @@ def lister_comptes_bancaires(request):
     return Response(serializer.data, status=200)
 
 @api_view(['GET'])
+@agent_required
 @permission_classes([IsAuthenticated])
 def comptes_by_user(request, user_id):
     """
     Liste les comptes d'un utilisateur donné (réservé aux agents).
     """
-    if 'agent' not in [r.lower() for r in getattr(request.user, 'roles', [])]:
-        return Response({"error": "Accès interdit : réservée aux agents."}, status=403)
-
     comptes = CompteBancaire.objects.filter(proprietaire_id=user_id)
     serializer = ListerComptesBancairesSerializer(comptes, many=True)
     return Response(serializer.data, status=200)
@@ -39,7 +36,7 @@ def comptes_by_user(request, user_id):
 @permission_classes([IsAuthenticated])
 def creer_compte_bancaire(request):
     """
-    Crée un compte bancaire pour l'utilisateur connecté.
+    Permet à un utilisateur de créer un compte bancaire.
     """
     data = request.data.copy()
     data['proprietaire_id'] = request.user.id
@@ -50,7 +47,6 @@ def creer_compte_bancaire(request):
     serializer = InteractWithCompteBancaireSerializer(data=data)
     if serializer.is_valid():
         compte = serializer.save()
-        # Ajout du log
         send_log("log.membres.info", {
             "level": "INFO",
             "type_action": "CREATION_COMPTE",
@@ -73,11 +69,7 @@ def compte_rib(request, rib):
     if not compte:
         return Response({"error": "Compte introuvable ou non validé."}, status=404)
     
-    return Response({
-        "id": compte.id,
-        "proprietaire_id": compte.proprietaire_id,
-        "numero_compte": compte.numero_compte
-    }, status=200)
+    return Response({"id": compte.id,"proprietaire_id": compte.proprietaire_id,"numero_compte": compte.numero_compte}, status=200)
 
 
 @api_view(['DELETE'])
@@ -90,7 +82,7 @@ def supprimer_compte(request, compte_id):
     if not compte:
         return Response({'error': 'Compte non trouvé'}, status=404)
     compte.delete()
-    # Ajout du log
+
     send_log("log.membres.info", {
         "level": "INFO",
         "type_action": "COMPTE",
@@ -101,9 +93,8 @@ def supprimer_compte(request, compte_id):
     })
     return Response({'message': 'Compte supprimé avec succès.'}, status=204)
 
-# ==============================
-#      FONCTIONS MÉTIER
-# ==============================
+
+# ------------------ Logique des opérations bancaires ------------------
 
 def virement_compte_bancaire(source_compte, destination_compte, montant):
     if source_compte.est_valide and destination_compte.est_valide:
@@ -204,9 +195,7 @@ def ajout_compte_bancaire(compte, montant):
         raise ValueError("Le compte n'est pas valide.")
 
 
-# ==============================
-#   OPÉRATIONS BANCAIRES - CLIENT
-# ==============================
+# ----------------------- VUES POUR LES OPÉRATIONS BANCAIRES -----------------------
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -245,18 +234,15 @@ def creer_operation(request):
     return Response(serializer.errors, status=400)
 
 
-# ==============================
-#   OPÉRATIONS BANCAIRES - AGENT
-# ==============================
+#------------------ VUES POUR LA VALIDATION DES OPÉRATIONS BANCAIRES (AGENTS)------------------
 
 @api_view(['GET'])
+@agent_required
 @permission_classes([IsAuthenticated])
 def lister_operations_en_attente(request):
     """
     Liste des opérations en attente (agents uniquement).
     """
-    if 'agent' not in getattr(request.user, 'roles', []):
-        return Response({"error": "Accès interdit"}, status=403)
 
     operations = OperationBancaire.objects.filter(statut='en_attente')
     serializer = OperationBancaireSerializer(operations, many=True)
@@ -264,19 +250,20 @@ def lister_operations_en_attente(request):
 
 
 @api_view(['POST'])
+@agent_required
 @permission_classes([IsAuthenticated])
 def valider_operation(request, operation_id):
     """
     Valide une opération bancaire (agents uniquement).
     """
-    if 'agent' not in getattr(request.user, 'roles', []):
-        return Response({"error": "Accès interdit"}, status=403)
+    operation = OperationBancaire.objects.filter(id=operation_id).first()
+    if not operation:
+        return Response({"error": "Opération introuvable"}, status=404)
+
+    if operation.statut != 'en_attente':
+        return Response({"error": "L'opération a déjà été traitée."}, status=400)
 
     try:
-        operation = OperationBancaire.objects.get(id=operation_id)
-        if operation.statut != 'en_attente':
-            return Response({"error": "L'opération a déjà été traitée."}, status=400)
-
         if operation.type_operation == 'depot':
             ajout_compte_bancaire(operation.compte_de_credit, operation.montant)
         elif operation.type_operation == 'retrait':
@@ -285,48 +272,41 @@ def valider_operation(request, operation_id):
             virement_compte_bancaire(operation.compte_de_debit, operation.compte_de_credit, operation.montant)
         else:
             return Response({"error": "Type d'opération inconnu"}, status=400)
-
-        operation.statut = 'validee'
-        operation.agent_validateur_id = request.user.id
-        operation.date_validation = datetime.now()
-        operation.save()
-
+    except ValueError as ve:
         send_log("log.membres.info", {
-            "level": "INFO",
+            "level": "ERROR",
             "type_action": operation.type_operation.upper(),
             "visibilite": "AGENTS",
             "identifiant_utilisateur": str(operation.effectue_par_id),
-            "source": "fonct_service",
-            "message": f"Opération '{operation.type_operation}' validée par l'agent {request.user.username} (id={request.user.id}) pour le compte {operation.compte_de_debit.numero_compte if operation.compte_de_debit else operation.compte_de_credit.numero_compte} d'un montant de {operation.montant}€."
-        })
-
-        return Response({"message": "Opération validée avec succès."}, status=200)
-
-    except OperationBancaire.DoesNotExist:
-        return Response({"error": "Opération introuvable"}, status=404)
-
-    except ValueError as ve:
-
-        send_log("log.membres.info", {
-            "level": "ERROR",
-            "type_action": operation.type_operation.upper() if 'operation' in locals() else "OPERATION",
-            "visibilite": "AGENTS",
-            "identifiant_utilisateur": str(operation.effectue_par_id) if 'operation' in locals() else "",
             "source": "fonct_service",
             "message": f"Erreur lors de la validation de l'opération : {str(ve)}"
         })
         return Response({"error": str(ve)}, status=400)
 
+    operation.statut = 'validee'
+    operation.agent_validateur_id = request.user.id
+    operation.date_validation = datetime.now()
+    operation.save()
+
+    send_log("log.membres.info", {
+        "level": "INFO",
+        "type_action": operation.type_operation.upper(),
+        "visibilite": "AGENTS",
+        "identifiant_utilisateur": str(operation.effectue_par_id),
+        "source": "fonct_service",
+        "message": f"Opération '{operation.type_operation}' validée par l'agent {request.user.username} (id={request.user.id}) pour le compte {operation.compte_de_debit.numero_compte if operation.compte_de_debit else operation.compte_de_credit.numero_compte} d'un montant de {operation.montant}€."
+    })
+
+    return Response({"message": "Opération validée avec succès."}, status=200)
+
 
 @api_view(['POST'])
+@agent_required
 @permission_classes([IsAuthenticated])
 def rejeter_operation(request, operation_id):
     """
     Rejette une opération (agents uniquement).
     """
-    if 'agent' not in getattr(request.user, 'roles', []):
-        return Response({"error": "Accès interdit"}, status=403)
-
     try:
         operation = OperationBancaire.objects.get(id=operation_id)
         if operation.statut != 'en_attente':
@@ -353,19 +333,15 @@ def rejeter_operation(request, operation_id):
         return Response({"error": "Opération introuvable"}, status=404)
 
 
-# ==============================
-#     VALIDATION ADMIN - AGENT
-# ==============================
+# ----------------- VUES POUR LA VALIDATION DES COMPTES BANCAIRES (AGENTS) -----------------
 
 @api_view(['GET'])
+@agent_required
 @permission_classes([IsAuthenticated])
 def lister_comptes_non_valides(request):
     """
     Liste les comptes non validés (agents uniquement).
     """
-    if 'agent' not in getattr(request.user, 'roles', []):
-        return Response({"error": "Accès interdit"}, status=403)
-
     try:
         comptes = CompteBancaire.objects.filter(est_valide=False)
         serializer = ListerComptesBancairesSerializer(comptes, many=True)
@@ -376,73 +352,63 @@ def lister_comptes_non_valides(request):
 
 
 @api_view(['POST'])
+@agent_required
 @permission_classes([IsAuthenticated])
 def valider_compte(request, compte_id):
     """
     Valide un compte bancaire (agents uniquement).
     """
-    roles = getattr(request.user, 'roles', [])
-    if 'agent' not in [r.lower() for r in roles]:
-        return Response({"error": "Accès interdit : vous devez être agent."}, status=403)
-
-    try:
-        compte = CompteBancaire.objects.get(id=compte_id, est_valide=False)
-        compte.est_valide = True
-        compte.save()
-        # Ajout du log
-        send_log("log.membres.info", {
-            "level": "INFO",
-            "type_action": "VALIDATION_COMPTE",
-            "visibilite": "AGENTS",
-            "identifiant_utilisateur": str(compte.proprietaire_id),
-            "source": "fonct_service",
-            "message": f"Compte bancaire {compte.numero_compte} validé par l'agent {request.user.username} (id={request.user.id})."
-        })
-        return Response({"message": "Compte validé."}, status=200)
-    except CompteBancaire.DoesNotExist:
+    compte = CompteBancaire.objects.filter(id=compte_id, est_valide=False).first()
+    if not compte:
         return Response({"error": "Compte introuvable ou déjà validé."}, status=404)
+    compte.est_valide = True
+    compte.save()
+    # Ajout du log
+    send_log("log.membres.info", {
+        "level": "INFO",
+        "type_action": "VALIDATION_COMPTE",
+        "visibilite": "AGENTS",
+        "identifiant_utilisateur": str(compte.proprietaire_id),
+        "source": "fonct_service",
+        "message": f"Compte bancaire {compte.numero_compte} validé par l'agent {request.user.username} (id={request.user.id})."
+    })
+    return Response({"message": "Compte validé."}, status=200)
 
 
 @api_view(['DELETE'])
+@agent_required
 @permission_classes([IsAuthenticated])
 def supprimer_compte_admin(request, compte_id):
     """
     Supprime n'importe quel compte bancaire (agents uniquement).
     """
-    roles = getattr(request.user, 'roles', [])
-    if 'agent' not in [r.lower() for r in roles]:
-        return Response({"error": "Accès interdit."}, status=403)
-
-    try:
-        compte = CompteBancaire.objects.get(id=compte_id)
-        compte.delete()
-        # Ajout du log
-        send_log("log.membres.info", {
-            "level": "INFO",
-            "type_action": "COMPTE",
-            "visibilite": "AGENTS",
-            "identifiant_utilisateur": str(compte.proprietaire_id),
-            "source": "fonct_service",
-            "message": f"Suppression du compte bancaire {compte_id} par l'agent {request.user.username} (id={request.user.id})."
-        })
-        return Response({"message": "Compte supprimé avec succès."}, status=204)
-    except CompteBancaire.DoesNotExist:
+    compte = CompteBancaire.objects.filter(id=compte_id).first()
+    if not compte:
         return Response({"error": "Compte introuvable."}, status=404)
+    compte.delete()
+
+    send_log("log.membres.info", {
+        "level": "INFO",
+        "type_action": "COMPTE",
+        "visibilite": "AGENTS",
+        "identifiant_utilisateur": str(compte.proprietaire_id),
+        "source": "fonct_service",
+        "message": f"Suppression du compte bancaire {compte_id} par l'agent {request.user.username} (id={request.user.id})."
+    })
+    return Response({"message": "Compte supprimé avec succès."}, status=204)
 
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def modifier_compte(request, compte_id):
-    try:
-        compte = CompteBancaire.objects.get(id=compte_id, proprietaire_id=request.user.id)
-    except CompteBancaire.DoesNotExist:
+    compte = CompteBancaire.objects.filter(id=compte_id, proprietaire_id=request.user.id).first()
+    if not compte:
         return Response({'error': 'Compte non trouvé'}, status=404)
 
     serializer = InteractWithCompteBancaireSerializer(compte, data=request.data, partial=True)
 
     if serializer.is_valid():
         compte_modifie = serializer.save()
-        # Ajout du log
         send_log("log.membres.info", {
             "level": "INFO",
             "type_action": "COMPTE",

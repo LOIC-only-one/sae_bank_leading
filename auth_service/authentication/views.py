@@ -35,17 +35,7 @@ class RegisterView(APIView):
 
             return Response({
                 'message': 'Compte créé',
-                'user': {
-                    'id': new_utilisateur.id,
-                    'username': new_utilisateur.username,
-                    'email': new_utilisateur.email,
-                    'role': new_utilisateur.role,
-                    'is_active': new_utilisateur.is_active,
-                    'first_name': new_utilisateur.first_name,
-                    'last_name': new_utilisateur.last_name,
-                    'phone_number': new_utilisateur.phone_number,
-                    'address': new_utilisateur.address
-                }
+                'user': {'id': new_utilisateur.id,'username': new_utilisateur.username,'email': new_utilisateur.email,'role': new_utilisateur.role,'is_active': new_utilisateur.is_active,'first_name': new_utilisateur.first_name,'last_name': new_utilisateur.last_name,'phone_number': new_utilisateur.phone_number,'address': new_utilisateur.address}
             }, status=status.HTTP_201_CREATED)
         return Response(serialiseur.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -68,20 +58,7 @@ class LoginView(APIView):
                 "message": f"Utilisateur {utilisateur.username} connecté."
             })
 
-            return Response({
-                "token": token.key,
-                "user": {
-                    "id": utilisateur.id,
-                    "username": utilisateur.username,
-                    "role": utilisateur.role,
-                    "email": utilisateur.email,
-                    "is_active": utilisateur.is_active,
-                    "first_name": utilisateur.first_name,
-                    "last_name": utilisateur.last_name,
-                    "phone_number": utilisateur.phone_number,
-                    "address": utilisateur.address
-                }
-            })
+            return Response({"token": token.key, "user": {"id": utilisateur.id, "username": utilisateur.username, "role": utilisateur.role, "email": utilisateur.email, "is_active": utilisateur.is_active, "first_name": utilisateur.first_name, "last_name": utilisateur.last_name, "phone_number": utilisateur.phone_number, "address": utilisateur.address}})
         return Response(serialiseur.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileView(APIView):
@@ -237,14 +214,7 @@ class AgentCreateView(APIView):
 
             return Response({
                 'message': 'Agent créé',
-                'user': {
-                    'id': nouvel_agent.id,
-                    'username': nouvel_agent.username,
-                    'email': nouvel_agent.email,
-                    'role': nouvel_agent.role,
-                    'is_active': nouvel_agent.is_active,
-                    'token': token.key
-                }
+                'user': {'id': nouvel_agent.id,'username': nouvel_agent.username,'email': nouvel_agent.email,'role': nouvel_agent.role,'is_active': nouvel_agent.is_active,'token': token.key}
             }, status=status.HTTP_201_CREATED)
         return Response(serialiseur.errors, status=status.HTTP_400_BAD_REQUEST)
 

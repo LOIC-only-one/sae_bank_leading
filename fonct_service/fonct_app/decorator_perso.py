@@ -1,7 +1,5 @@
 import requests
 from rest_framework.authentication import BaseAuthentication
-from rest_framework import exceptions
-from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -35,3 +33,15 @@ class RemoteTokenAuthentication(BaseAuthentication):
         user.roles = [data.get('role', '').lower()]
 
         return (user, None)
+
+
+from rest_framework.response import Response
+
+def agent_required(view_func):
+    def decorated_view(request, *args, **kwargs):
+        roles = getattr(request.user, 'roles', [])
+        for r in roles:
+            if r.lower() == 'agent':
+                return view_func(request, *args, **kwargs)
+        return Response({"error": "Accès interdit : vous devez être agent."}, status=403)
+    return decorated_view

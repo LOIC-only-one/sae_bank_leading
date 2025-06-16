@@ -13,6 +13,7 @@ https://stackoverflow.com/questions/42567475/docker-compose-check-if-mysql-conne
 https://docs.djangoproject.com/en/5.2/ref/templates/language/ - Django Template Language
 https://docs.djangoproject.com/en/5.2/ref/templates/builtins/#ref-templates-builtins-filters = Django Template Filters
 
+https://python.doctor/page-decorateurs-decorator-python-cours-debutants = Les decorateurs en Python
 
 - Ajouter du docker swarm pour les microservices si il reste du temps ()
 

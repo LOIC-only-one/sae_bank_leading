@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Logs - {{ user.username }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gradient-to-br from-indigo-100 via-white to-blue-100 min-h-screen font-sans">
 
@@ -70,6 +71,44 @@
       </div>
     </div>
 
+    <!-- Bloc graphique pour les agents -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col items-center">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center justify-center">
+        <span class="text-2xl mr-2">📊</span>
+        Graphiques d'analyse
+      </h2>
+      <div class="w-full flex justify-center">
+        <div class="max-w-md w-full">
+          <canvas id="myChart"></canvas>
+        </div>
+      </div>
+      <script>
+        const ctx = document.getElementById('myChart');
+        new Chart(ctx, {
+          type: 'polarArea',
+          data: {
+            labels: ['Label 1', 'Label 2', 'Label 3'],
+            datasets: [{
+              label: 'Événements',
+              data: [10, 20, 30],
+              backgroundColor: [
+                'rgba(99, 102, 241, 0.5)',
+                'rgba(59, 130, 246, 0.5)',
+                'rgba(16, 185, 129, 0.5)'
+              ]
+            }]
+          },
+          options: {
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      </script>
+    </div>
     <!-- Filtres avancés -->
     <form method="get" class="bg-white rounded-2xl shadow-lg p-6 mb-8 space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    """Prmet de creer un user custom avec AbstractUser et de lui ajouter des champs supplémentaires"""
     class UserRoles(models.TextChoices):
         CLIENT = 'CLIENT', 'Client'
         AGENT = 'AGENT', 'Agent'
@@ -21,7 +20,6 @@ class User(AbstractUser):
         return f"{self.username} ({self.role}) - {self.email}"
     
     def save(self, *args, **kwargs):
-        """Permet de créer un super utilisateur avec le rôle SUPER_USER et l'activer automatiquement."""
         if self.is_superuser:
             self.role = self.UserRoles.SUPER_USER
             self.is_active = True
