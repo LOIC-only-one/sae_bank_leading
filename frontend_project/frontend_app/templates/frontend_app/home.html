@@ -52,29 +52,29 @@
         <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <h2 class="text-2xl font-bold text-gray-900 mb-6">Informations du compte</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-indigo-50 rounded-xl p-4">
-              <div class="flex items-center mb-2">
-                <span class="text-2xl mr-2">🆔</span>
-                <span class="font-semibold text-indigo-700">ID Utilisateur</span>
-              </div>
-              <p class="text-xl font-bold text-gray-900">{{ user.id }}</p>
-            </div>
-            <div class="bg-blue-50 rounded-xl p-4">
-              <div class="flex items-center mb-2">
-                <span class="text-2xl mr-2">📧</span>
-                <span class="font-semibold text-blue-700">Email</span>
-              </div>
-              <p class="text-lg font-medium text-gray-900">{{ user.email }}</p>
-            </div>
-            <div class="bg-purple-50 rounded-xl p-4">
-              <div class="flex items-center mb-2">
-                <span class="text-2xl mr-2">🔰</span>
-                <span class="font-semibold text-purple-700">Rôle</span>
-              </div>
-              <span class="bg-purple-200 text-purple-800 text-sm font-semibold uppercase tracking-wide px-3 py-1 rounded-full">
-                {{ user.role }}
-              </span>
-            </div>
+        <div class="bg-indigo-50 rounded-xl p-4">
+          <div class="flex items-center mb-2">
+            <span class="text-2xl mr-2">🆔</span>
+            <span class="font-semibold text-indigo-700">ID Utilisateur</span>
+          </div>
+          <p class="text-xl font-bold text-gray-900">{{ user.id }}</p>
+        </div>
+        <div class="bg-blue-50 rounded-xl p-4">
+          <div class="flex items-center mb-2">
+            <span class="text-2xl mr-2">📧</span>
+            <span class="font-semibold text-blue-700">Email</span>
+          </div>
+          <p class="text-lg font-medium text-gray-900">{{ user.email }}</p>
+        </div>
+        <div class="bg-purple-50 rounded-xl p-4">
+          <div class="flex items-center mb-2">
+            <span class="text-2xl mr-2">🔰</span>
+            <span class="font-semibold text-purple-700">Rôle</span>
+          </div>
+          <span class="bg-purple-200 text-purple-800 text-sm font-semibold uppercase tracking-wide px-3 py-1 rounded-full">
+            {{ user.role }}
+          </span>
+        </div>
           </div>
         </div>
 
@@ -84,109 +84,109 @@
           
           <!-- Actions communes -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <form action="{% url 'profile' %}" method="get">
-              <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
-                Consulter mon profil
-              </button>
-            </form>
+        <form action="{% url 'profile' %}" method="get">
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            Consulter mon profil
+          </button>
+        </form>
           </div>
 
           <!-- Actions spécifiques SUPER_USER -->
           {% if user.role == "SUPER_USER" %}
           <div class="border-t pt-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <span class="text-2xl mr-2">👑</span>
-              Actions Administrateur
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <form action="{% url 'create_agent' %}" method="get">
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  Créer un agent
-                </button>
-              </form>
-            </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <span class="text-2xl mr-2">👑</span>
+          Actions Administrateur
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form action="{% url 'create_agent' %}" method="get">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Créer un agent
+            </button>
+          </form>
+        </div>
           </div>
           {% endif %}
 
           <!-- Actions spécifiques AGENT -->
           {% if user.role|lower == "agent" %}
           <div class="border-t pt-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <span class="text-2xl mr-2">🏦</span>
-              Actions Agent Bancaire
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <form action="{% url 'pending_clients' %}" method="get">
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 01-3 0m3 0h.75m-9 0H3m6 0h.75m-9 0H3"></path>
-                  </svg>
-                  Clients en attente
-                </button>
-              </form>
-              
-              <form action="{% url 'comptes_en_attente' %}" method="get">
-                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  Comptes à valider
-                </button>
-              </form>
-              
-              <form action="{% url 'lister_operations' %}" method="get">
-                <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                  </svg>
-                  Opérations en attente
-                </button>
-              </form>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <span class="text-2xl mr-2">🏦</span>
+          Actions Agent Bancaire
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <form action="{% url 'pending_clients' %}" method="get">
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 01-3 0m3 0h.75m-9 0H3m6 0h.75m-9 0H3"></path>
+          </svg>
+          Clients en attente
+            </button>
+          </form>
+          
+          <form action="{% url 'comptes_en_attente' %}" method="get">
+            <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Comptes à valider
+            </button>
+          </form>
+          
+          <form action="{% url 'lister_operations' %}" method="get">
+            <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+          </svg>
+          Opérations en attente
+            </button>
+          </form>
 
-              <form action="{% url 'gerer_utilisateur' %}" method="get">
-                <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-5a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                  </svg>
-                  Gestion des utilisateurs
-                </button>
-              </form>
-            </div>
+          <form action="{% url 'gerer_utilisateur' %}" method="get">
+            <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-5a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          Gestion des utilisateurs
+            </button>
+          </form>
+        </div>
           </div>
           {% endif %}
 
           <!-- Actions spécifiques CLIENT -->
           {% if user.role|lower == "client" %}
           <div class="border-t pt-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <span class="text-2xl mr-2">💳</span>
-              Actions Client
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <form action="{% url 'lister_comptes' %}" method="get">
-                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                  </svg>
-                  Mes comptes
-                </button>
-              </form>
-              
-              <form action="{% url 'creer_compte' %}" method="get">
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  Créer un nouveau compte
-                </button>
-              </form>
-            </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <span class="text-2xl mr-2">💳</span>
+          Actions Client
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <form action="{% url 'lister_comptes' %}" method="get">
+            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+          </svg>
+          Mes comptes
+            </button>
+          </form>
+          
+          <form action="{% url 'creer_compte' %}" method="get">
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors shadow-md flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Créer un nouveau compte
+            </button>
+          </form>
+        </div>
           </div>
           {% endif %}
         </div>
@@ -194,25 +194,63 @@
         {% if user.role|lower == "client" %}
         <br>
         <div class="bg-white rounded-2xl shadow-lg p-6">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Dernières transactions</h2>
-          <div class="space-y-4">
-            {% for transaction in historique %}
-            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600">{{ transaction.date }}</span>
-                <span class="text-sm font-semibold">
-                  {{ transaction.type_operation }}
-                </span>
-              </div>
-              <p class="text-lg font-medium text-gray-900">{{ transaction.montant }} €</p>
-              <p class="text-sm text-gray-500">{{ transaction.details }}</p>
-            </div>
-            {% endfor %}
+          <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Historique des transactions</h2>
           </div>
-          {% if not historique %}
-          <p class="text-gray-500 text-center mt-4">Aucune transaction récente.</p>
-          {% endif %}
+
+          <!-- Liste des transactions -->
+          <div class="space-y-3" id="transactions-list">
+        {% for transaction in historique %}
+        <div class="bg-gray-50 hover:bg-gray-100 rounded-xl p-4 shadow-sm transition-all duration-200 border border-gray-200 hover:shadow-md">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+          <!-- Icône selon le type -->
+          <div class="bg-indigo-500 rounded-full p-2 flex-shrink-0">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+          </div>
+          
+          <div class="flex-grow">
+            <div class="flex items-center space-x-2 mb-1">
+              <h4 class="font-medium text-gray-900">{{ transaction.type_operation }}</h4>
+              <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">
+            Validé
+              </span>
+            </div>
+            <p class="text-sm text-gray-600">{{ transaction.details }}</p>
+            <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+              <span class="flex items-center">
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            {{ transaction.date }}
+              </span>
+              <span class="flex items-center">
+            </div>
+          </div>
+            </div>
+          </div>
         </div>
+        {% endfor %}
+          </div>
+
+          <!-- Message si aucune transaction -->  
+          {% if not historique %}
+          <div class="text-center py-12">
+        <div class="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune transaction récente</h3>
+        <p class="text-gray-500 max-w-sm mx-auto">Vos transactions apparaîtront ici une fois que vous commencerez à utiliser votre compte.</p>
+        <button class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+          Effectuer une transaction
+        </button>
+          </div>
+          {% endif %}
+          </div>
         {% endif %}
       </div>
 

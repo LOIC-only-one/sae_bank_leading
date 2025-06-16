@@ -7,6 +7,7 @@ from collections import Counter
 from datetime import datetime, timedelta
 from .utils import send_validation_email
 import os
+import re
 
 
 AUTH_API_URL = os.getenv("AUTH_API_URL", "http://authservice:8000")
@@ -27,6 +28,8 @@ def token_required(view_func):
 def vitrine_view(request):
     return render(request, 'frontend_app/vitrine.html')
 
+
+
 @token_required
 def dashboard_view(request):
     headers = {'Authorization': f'Token {request.session.get("token")}'}
@@ -34,11 +37,15 @@ def dashboard_view(request):
     liste_logs_transaction_historian = []
 
     comptes_response = requests.get(f"{API_BASE_URL_FONCT}/comptes/", headers=headers)
-    comptes = comptes_response.json() if comptes_response.status_code == 200 else []
+    if comptes_response.status_code == 200:
+        comptes = comptes_response.json()
+    else:
+        comptes = []
 
     response = requests.get(f'{LOGGING_API_URL}/logs/', headers=headers)
     if response.status_code == 200:
         logs = response.json()
+
         OPERATION_TYPES = {
             'VIREMENT': 'Virement',
             'DEPOT': 'Dépôt',
@@ -46,30 +53,53 @@ def dashboard_view(request):
             'OPERATION': 'Opération bancaire',
             'TRANSFERT': 'Transfert',
         }
+
         for log in logs:
             type_action = log.get('type_action')
-            if (log.get('identifiant_utilisateur') == user.get('id') and type_action in OPERATION_TYPES):
+            user_id_log = str(log.get('identifiant_utilisateur'))
+            current_user_id = str(user.get('id'))
+
+            if user_id_log == current_user_id and type_action in OPERATION_TYPES:
                 compte_id = log.get('compte_id')
                 rib = None
-                for compte in comptes:
-                    if compte.get('id') == compte_id:
-                        rib = compte.get('numero_compte')
-                        break
 
-                date_formatee = log['created_at']
+                if compte_id is not None:
+                    for compte in comptes:
+                        if str(compte.get('id')) == str(compte_id):
+                            rib = compte.get('numero_compte')
+                            break
+
                 if log.get('created_at'):
-                    date_formatee = datetime.fromisoformat(log['created_at'].replace("Z", "+00:00")).strftime("%d/%m/%Y %H:%M:%S")
-                liste_logs_transaction_historian.append({
+                    dt_obj = datetime.fromisoformat(log['created_at'].replace("Z", "+00:00"))
+                    date_formatee = dt_obj.strftime("%d/%m/%Y %H:%M:%S")
+                else:
+                    date_formatee = ""
+
+                montant = log.get('montant')
+                if montant is None and log.get('message'):
+                    match = re.search(r"([0-9]+(?:[.,][0-9]{1,2})?) ?€", log['message'])
+                    if match:
+                        montant = match.group(1).replace(',', '.')
+
+                log_dict = {
                     'date': date_formatee,
                     'rib': rib,
-                    'montant': log.get('montant'),
+                    'montant': montant,
                     'type_operation': OPERATION_TYPES.get(type_action, type_action),
                     'statut': log.get('level'),
-                    'details': log.get('message'),
-                })
+                    'details': log.get('message')
+                }
+                liste_logs_transaction_historian.append(log_dict)
+
+        def trier_par_date(log):
+            # On trie par date descendante (plus récente en premier)
+            return log['date']
+
+        liste_logs_transaction_historian.sort(key=trier_par_date, reverse=True)
+        # Ne garder que les 5 plus récentes
+        liste_logs_transaction_historian = liste_logs_transaction_historian[:5]
 
     return render(request, 'frontend_app/home.html', {'user': user, 'historique': liste_logs_transaction_historian})
-
 
 @token_required
 def modifier_profil_view(request):

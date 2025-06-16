@@ -7,10 +7,8 @@ https://dev.to/mayowakalejaiye/mastering-django-building-a-secure-user-authentic
 https://www.django-rest-framework.org/tutorial/1-serialization/ = Django Rest Framework - Serialization
 
 
-A fix :
-
-- A ajouter un historique de transactions pour les utilisateurs
-- A ajouter un historique de transactions pour les agents
+https://medium.com/@saklani1408/configuring-healthcheck-in-docker-compose-3fa6439ee280 = Les healthcheck docker
+https://stackoverflow.com/questions/42567475/docker-compose-check-if-mysql-connection-is-ready = Verifier que la base de données est prête dans docker-compose
 
 
 - Ajouter du docker swarm pour les microservices si il reste du temps ()
