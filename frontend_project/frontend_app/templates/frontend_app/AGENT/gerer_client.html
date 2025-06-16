@@ -21,9 +21,7 @@
                     <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                         Déconnexion
                     </a>
-                    <a href="{% url 'dashboard' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                      Tableau de bord
-                    </a>
+                    <a href="{% url 'dashboard' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Tableau de bord</a>
                 </div>
             </div>
         </div>
@@ -149,14 +147,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
-
-            <!-- Pagination ou info supplémentaire -->
-            <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
-                <div class="flex justify-between items-center text-sm text-gray-500">
-                    <span>Total : {{ users|length }} utilisateur{{ users|length|pluralize }}</span>
-                    <span>{{ users|length }} utilisateur{{ users|length|pluralize }} trouvé{{ users|length|pluralize }}</span>
-                </div>
             </div>
         </div>
 
