@@ -92,7 +92,6 @@ def dashboard_view(request):
                 liste_logs_transaction_historian.append(log_dict)
 
         def trier_par_date(log):
-            # On trie par date descendante (plus récente en premier)
             return log['date']
 
         liste_logs_transaction_historian.sort(key=trier_par_date, reverse=True)
@@ -683,7 +682,6 @@ def valider_compte_view(request, compte_id):
 
 
 # ----------- Gestion des Logs (Agents + Membres) -----------
-
 @token_required
 def afficher_logs_view(request):
     utilisateur = request.session.get('user')
@@ -780,7 +778,6 @@ def afficher_logs_view(request):
             statistiques['success_rate'] = 0
 
     return render(request, 'frontend_app/ALL/logs.html', {
-        'logs': liste_logs,
         'is_agent': est_agent,
         'user': utilisateur,
         'params': parametres,
