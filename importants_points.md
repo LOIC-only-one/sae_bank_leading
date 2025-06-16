@@ -10,6 +10,9 @@ https://www.django-rest-framework.org/tutorial/1-serialization/ = Django Rest Fr
 https://medium.com/@saklani1408/configuring-healthcheck-in-docker-compose-3fa6439ee280 = Les healthcheck docker
 https://stackoverflow.com/questions/42567475/docker-compose-check-if-mysql-connection-is-ready = Verifier que la base de données est prête dans docker-compose
 
+https://docs.djangoproject.com/en/5.2/ref/templates/language/ - Django Template Language
+https://docs.djangoproject.com/en/5.2/ref/templates/builtins/#ref-templates-builtins-filters = Django Template Filters
+
 
 - Ajouter du docker swarm pour les microservices si il reste du temps ()
 

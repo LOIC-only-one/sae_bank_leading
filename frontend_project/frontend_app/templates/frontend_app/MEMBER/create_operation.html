@@ -193,11 +193,13 @@
                 Compte interne (optionnel)
               </label>
               <select name="compte_de_credit" class="w-full bg-white border-2 border-blue-200 rounded-xl py-3 px-4 focus:border-blue-500 transition-all">
-                <option value="">-- Sélectionner un compte interne --</option>
+                <option value="">Choisir un compte cible</option>
                 {% for compte in comptes_user %}
+                  {% if compte.id != compte_id %}
                   <option value="{{ compte.id }}">
-                    {{ compte.numero_compte }} — {{ compte.solde|floatformat:2 }} €
+                    {{ compte.numero_compte }}
                   </option>
+                  {% endif %}
                 {% endfor %}
               </select>
             </div>
