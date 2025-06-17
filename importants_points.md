@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/5.2/ref/templates/language/ - Django Template 
 https://docs.djangoproject.com/en/5.2/ref/templates/builtins/#ref-templates-builtins-filters = Django Template Filters
 
 https://python.doctor/page-decorateurs-decorator-python-cours-debutants = Les decorateurs en Python
-
-- Ajouter du docker swarm pour les microservices si il reste du temps ()
-
 https://app.mailjet.com/dashboard
+
+- Fix les graphiques avec les bonnes datas
+- Fix les messages d'erreurs lors des operations en cas de soldes insuffisants sur le compte
