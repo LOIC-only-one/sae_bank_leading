@@ -16,5 +16,5 @@ https://docs.djangoproject.com/en/5.2/ref/templates/builtins/#ref-templates-buil
 https://python.doctor/page-decorateurs-decorator-python-cours-debutants = Les decorateurs en Python
 https://app.mailjet.com/dashboard
 
-- Fix les graphiques avec les bonnes datas
+
 - Fix les messages d'erreurs lors des operations en cas de soldes insuffisants sur le compte
