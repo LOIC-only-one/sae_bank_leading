@@ -46,7 +46,7 @@ Base URL : `/api/auth/`
 **Réponse :**
 ```json
 {
-  "token": "..."  // si JWT
+  "token": "..." 
 }
 ```
 
