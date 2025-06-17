@@ -220,8 +220,6 @@ def register_view(request):
                     user_email=user_email,
                     message="Votre inscription a bien été prise en compte. Un agent va valider votre compte prochainement."
                 )
-            messages.success(request, "Inscription réussie. Vous pouvez maintenant vous connecter.")
-            messages.info(request, "Un agent va valider votre compte.")
             return redirect('login')
         else:
             error_data = response.json()
@@ -232,7 +230,6 @@ def register_view(request):
 
 def logout_view(request):
     request.session.flush()
-    messages.success(request, "Vous avez été déconnecté avec succès.")
     return redirect('login')
 
 
@@ -400,7 +397,6 @@ def gerer_utilisateur_action_view(request, utilisateur_id):
 
     elif action == "delete":
         if a_comptes:
-            # Suppression de chaque compte avant suppression de l'utilisateur
             suppression_reussie = True
             for compte in a_comptes:
                 compte_id = compte.get("id")
@@ -532,9 +528,6 @@ def modifier_rib_view(request, compte_id):
 @token_required
 @require_http_methods(["GET", "POST"])
 def creer_operation_view(request, compte_id=None):
-    """
-    Vue pour déposer, retirer ou virer de l'argent
-    """
     headers = {'Authorization': f'Token {request.session.get("token")}'}
     type_from_url = None
 
@@ -602,7 +595,6 @@ def lister_operations_en_attente(request):
     jeton = request.session.get('token')
     entetes = {'Authorization': f'Token {jeton}'}
 
-    # Récupération des opérations en attente depuis fonct_service
     reponse = requests.get(f"{API_BASE_URL_FONCT}/operations/en-attente/", headers=entetes)
     if reponse.status_code != 200:
         messages.error(request, "Erreur lors de la récupération des opérations en attente.")
@@ -610,17 +602,14 @@ def lister_operations_en_attente(request):
 
     operations_en_attente = reponse.json()
 
-    # Collecter tous les identifiants uniques des utilisateurs ayant effectué une opération
     ids_utilisateurs = list({operation.get('effectue_par_id') for operation in operations_en_attente if operation.get('effectue_par_id')})
 
-    # Récupérer les informations des utilisateurs depuis auth_service
     infos_utilisateurs = {}
     for identifiant in ids_utilisateurs:
         reponse_utilisateur = requests.get(f"{AUTH_API_URL}/api/auth/users/{identifiant}/", headers=entetes)
         if reponse_utilisateur.status_code == 200:
             infos_utilisateurs[identifiant] = reponse_utilisateur.json()
 
-    # Ajouter les informations utilisateurs dans chaque opération
     for operation in operations_en_attente:
         identifiant = operation.get('effectue_par_id')
         operation['effectue_par'] = infos_utilisateurs.get(identifiant)
