@@ -98,6 +98,33 @@
       </div>
     </div>
 
+      {% if is_agent and topics_status %}
+        <h2 class="text-lg font-bold mt-6 mb-2">📡 État des Topics NATS</h2>
+        <table class="w-full table-auto border border-gray-300">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-4 py-2">Topic</th>
+              <th class="px-4 py-2">Statut</th>
+              <th class="px-4 py-2 text-right">Messages traités</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for topic in topics_status %}
+            <tr class="border-t">
+              <td class="px-4 py-2">{{ topic.topic }}</td>
+              <td class="px-4 py-2">
+                {% if topic.status == "RUNNING" %}
+                  <span class="text-green-600 font-semibold">En écoute</span>
+                {% else %}
+                  <span class="text-red-500 font-semibold">{{ topic.status }}</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-2 text-right">{{ topic.nombre_messages }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
     <!-- Graphiques pour les agents -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <div class="bg-white rounded-2xl shadow-lg p-6">

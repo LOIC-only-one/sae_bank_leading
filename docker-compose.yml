@@ -92,7 +92,7 @@ services:
   logginglistener:
     image: python:latest
     container_name: logginglistener
-    command: bash -c "pip install -r /app/requirements.txt && echo test && python /app/logging_api/listener.py"
+    command: bash -c "pip install -r /app/requirements.txt && echo Ok à utiilisation... && python /app/logging_api/listener.py"
     volumes:
       - ./logging_service:/app
     depends_on:

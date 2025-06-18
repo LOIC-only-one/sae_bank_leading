@@ -241,12 +241,29 @@ def creer_operation(request):
 @permission_classes([IsAuthenticated])
 def lister_operations_en_attente(request):
     """
-    Liste des opérations en attente (agents uniquement).
+    Liste des opérations en attente (agents uniquement) avec numéro de compte et solde.
     """
-
     operations = OperationBancaire.objects.filter(statut='en_attente')
     serializer = OperationBancaireSerializer(operations, many=True)
-    return Response(serializer.data)
+    operations_data = serializer.data
+
+    # Enrichir les données avec numéro de compte et solde
+    for i, operation in enumerate(operations):
+        if operation.compte_de_debit:
+            compte = operation.compte_de_debit
+        elif operation.compte_de_credit:
+            compte = operation.compte_de_credit
+        else:
+            compte = None
+
+        if compte:
+            operations_data[i]['numero_compte'] = compte.numero_compte
+            operations_data[i]['solde_compte'] = compte.solde
+        else:
+            operations_data[i]['numero_compte'] = None
+            operations_data[i]['solde_compte'] = None
+
+    return Response(operations_data, status=200)
 
 
 @api_view(['POST'])
