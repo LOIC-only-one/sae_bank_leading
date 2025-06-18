@@ -189,7 +189,8 @@ Base URL : `/api/auth/`
 {
   "valid": true,
   "user_id": 1,
-  "username": "jdoe"
+  "username": "jdoe",
+  "role": "CLIENT"
 }
 ```
 
