@@ -31,14 +31,10 @@ class InteractWithCompteBancaireSerializer(serializers.ModelSerializer):
     
     def validate(self, data):
         if not data.get('proprietaire_id'):
-            raise serializers.ValidationError({
-                'proprietaire_id': ['This field is required.']
-            })
+            raise serializers.ValidationError({'proprietaire_id': ['This field is required.']})
         
         if not data.get('numero_compte'):
-            raise serializers.ValidationError({
-                'numero_compte': ['This field is required.']
-            })
+            raise serializers.ValidationError({'numero_compte': ['This field is required.']})
             
         return data
 
