@@ -347,7 +347,7 @@ def lister_comptes_non_valides(request):
         serializer = ListerComptesBancairesSerializer(comptes, many=True)
         return Response(serializer.data, status=200)
 
-    except Exception:
+    except Exception as e:
         return Response({"error": "Erreur serveur lors de la récupération des comptes"}, status=500)
 
 
@@ -363,7 +363,7 @@ def valider_compte(request, compte_id):
         return Response({"error": "Compte introuvable ou déjà validé."}, status=404)
     compte.est_valide = True
     compte.save()
-
+    # Ajout du log
     send_log("log.membres.info", {
         "level": "INFO",
         "type_action": "VALIDATION_COMPTE",

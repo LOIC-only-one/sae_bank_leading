@@ -23,6 +23,7 @@ class RegisterView(APIView):
         if serialiseur.is_valid():
             new_utilisateur = serialiseur.save()
 
+            # Ajout du log via send_log
             send_log("log.membres.info", {
                 "level": "INFO",
                 "type_action": "CREATION_COMPTE",
@@ -32,7 +33,10 @@ class RegisterView(APIView):
                 "message": f"Nouvel utilisateur créé: {new_utilisateur.username} mais en attente de validation par un agent."
             })
 
-            return Response({'message': 'Compte créé','user': {'id': new_utilisateur.id,'username': new_utilisateur.username,'email': new_utilisateur.email,'role': new_utilisateur.role,'is_active': new_utilisateur.is_active,'first_name': new_utilisateur.first_name,'last_name': new_utilisateur.last_name,'phone_number': new_utilisateur.phone_number,'address': new_utilisateur.address}}, status=status.HTTP_201_CREATED)
+            return Response({
+                'message': 'Compte créé',
+                'user': {'id': new_utilisateur.id,'username': new_utilisateur.username,'email': new_utilisateur.email,'role': new_utilisateur.role,'is_active': new_utilisateur.is_active,'first_name': new_utilisateur.first_name,'last_name': new_utilisateur.last_name,'phone_number': new_utilisateur.phone_number,'address': new_utilisateur.address}
+            }, status=status.HTTP_201_CREATED)
         return Response(serialiseur.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

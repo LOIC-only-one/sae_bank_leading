@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 import requests
 from django.views.decorators.http import require_http_methods
+from datetime import datetime
 from collections import Counter
 from datetime import datetime, timedelta
 from .utils import send_validation_email
@@ -11,7 +12,7 @@ import re
 
 AUTH_API_URL = os.getenv("AUTH_API_URL", "http://authservice:8000")
 LOGGING_API_URL = os.getenv("LOGGING_API_URL", "http://loggingservice:8003")
-API_BASE_URL_FONCT = os.getenv("FONCT_API_URL", "http://fonctservice:8002/api")
+API_BASE_URL_FONCT = "http://fonctservice:8002/api"
 
 
 
@@ -94,8 +95,7 @@ def dashboard_view(request):
             return log['date']
 
         liste_logs_transaction_historian.sort(key=trier_par_date, reverse=True)
-
-
+        # Ne garder que les 5 plus récentes
         liste_logs_transaction_historian = liste_logs_transaction_historian[:5]
 
     return render(request, 'frontend_app/home.html', {'user': user, 'historique': liste_logs_transaction_historian})
@@ -123,7 +123,11 @@ def modifier_profil_view(request):
                 messages.error(request, "Pour changer le mot de passe, vous devez remplir les trois champs.")
                 return redirect('profile')
 
-            reset_data = {"old_password": old_password,"new_password": new_password,"confirm_password": confirm_password}
+            reset_data = {
+                "old_password": old_password,
+                "new_password": new_password,
+                "confirm_password": confirm_password
+            }
             reset_response = requests.post(reset_url, json=reset_data, headers=headers)
 
             if reset_response.status_code == 200:
@@ -174,7 +178,10 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        response = requests.post(f"{AUTH_API_URL}/api/auth/login/", json={'username': username,'password': password})
+        response = requests.post(f"{AUTH_API_URL}/api/auth/login/", json={
+            'username': username,
+            'password': password
+        })
 
         if response.status_code == 200:
             response_data = response.json()
@@ -196,13 +203,23 @@ def register_view(request):
         password = request.POST.get('password')
         password_confirm = request.POST.get('confirm_password')
 
-        response = requests.post(f"{AUTH_API_URL}/api/auth/register/", json={'username': username,'email': email,'first_name': first_name,'last_name': last_name,'password': password,'confirm_password': password_confirm,})
+        response = requests.post(f"{AUTH_API_URL}/api/auth/register/", json={
+            'username': username,
+            'email': email,
+            'first_name': first_name,
+            'last_name': last_name,
+            'password': password,
+            'confirm_password': password_confirm,
+        })
 
         if response.status_code == 201:
             user_data = response.json().get('user', {})
             user_email = user_data.get('email', email)
             if user_email:
-                send_validation_email(user_email=user_email,message="Votre inscription a bien été prise en compte. Un agent va valider votre compte prochainement.")
+                send_validation_email(
+                    user_email=user_email,
+                    message="Votre inscription a bien été prise en compte. Un agent va valider votre compte prochainement."
+                )
             return redirect('login')
         else:
             error_data = response.json()
@@ -271,14 +288,21 @@ def validate_user_view(request, user_id):
         headers = {'Authorization': f"Token {request.session.get('token')}"}
 
         response = requests.post(
-            f"{AUTH_API_URL}/api/auth/users/{user_id}/validate/",headers=headers,json={'is_active': True})
+            f"{AUTH_API_URL}/api/auth/users/{user_id}/validate/",
+            headers=headers,
+            json={'is_active': True}
+        )
 
         if response.status_code == 200:
             messages.success(request, "Utilisateur validé et activé avec succès.")
+            response_data = response.json()
             user_data = response.json().get('user', {})
             user_email = user_data.get('email', None)
             if user_email:
-                send_validation_email(user_email=user_email,message=f"Votre compte a été validé avec succès par {user.get('username', 'un agent')}. Vous pouvez maintenant vous connecter.")
+                send_validation_email(
+                    user_email=user_email,
+                    message=f"Votre compte a été validé avec succès par {user.get('username', 'un agent')}. Vous pouvez maintenant vous connecter."
+                )
         else:
             error_data = response.json()
             messages.error(request, f"Erreur lors de la validation: {error_data}")
@@ -296,7 +320,10 @@ def reject_user_view(request, user_id):
             user_data = response.json().get('user', {})
             user_email = user_data.get('email', None)
             if user_email:
-                send_validation_email(user_email=user_email,message=f"Votre compte a été rejeté par {user.get('username', 'un agent')}.")
+                send_validation_email(
+                    user_email=user_email,
+                    message=f"Votre compte a été rejeté par {user.get('username', 'un agent')}."
+                )
             messages.success(request, "Utilisateur rejeté et supprimé avec succès.")
         else:
             error_data = response.json()
@@ -310,13 +337,19 @@ def deactivate_user_view(request, user_id):
     if request.method == 'POST':
         headers = {'Authorization': f"Token {request.session.get('token')}"}
         response = requests.post(
-            f"{AUTH_API_URL}/api/auth/users/{user_id}/validate/",headers=headers,json={'is_active': False})
+            f"{AUTH_API_URL}/api/auth/users/{user_id}/validate/",
+            headers=headers,
+            json={'is_active': False}
+        )
 
         if response.status_code == 200:
             user_data = response.json().get('user', {})
             user_email = user_data.get('email', None)
             if user_email:
-                send_validation_email(user_email=user_email,message=f"Votre compte a été désactivé par {user.get('username', 'un agent')}.")
+                send_validation_email(
+                    user_email=user_email,
+                    message=f"Votre compte a été désactivé par {user.get('username', 'un agent')}."
+                )
             messages.success(request, "Utilisateur désactivé avec succès.")
         else:
             messages.error(request, f"Erreur lors de la désactivation: {response.json()}")
@@ -338,7 +371,9 @@ def gerer_utilisateur_view(request):
         utilisateurs = []
         messages.error(request, "Impossible de récupérer la liste des utilisateurs.")
 
-    return render(request, "frontend_app/AGENT/gerer_client.html", {"users": utilisateurs,})
+    return render(request, "frontend_app/AGENT/gerer_client.html", {
+        "users": utilisateurs,
+    })
 
 @token_required
 @require_http_methods(["POST"])
@@ -351,7 +386,10 @@ def gerer_utilisateur_action_view(request, utilisateur_id):
     
     if action == "disable":
         reponse = requests.post(
-            f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/validate/",headers=entetes,json={'is_active': False})
+            f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/validate/",
+            headers=entetes,
+            json={'is_active': False}
+        )
         if reponse.status_code == 200:
             messages.success(request, "Utilisateur désactivé.")
         else:
@@ -443,6 +481,7 @@ def creer_compte(request):
 
         if response.status_code == 201:
             messages.success(request, "Compte créé avec succès.")
+            send_validation_email(user_email=request.session.get('user', {}).get('email'),message=f"Votre compte {numero_compte} a été créé avec succès. Un agent va le valider prochainement.")
             return redirect('lister_comptes')
         else:
             messages.error(request, "Erreur lors de la création du compte.")
@@ -518,7 +557,12 @@ def creer_operation_view(request, compte_id=None):
     if request.method == 'POST':
         rib_manuel = request.POST.get('rib_manuel')
 
-        data = {'type_operation': request.POST.get('type_operation'),'montant': request.POST.get('montant'),'compte_de_credit': request.POST.get('compte_de_credit'),'compte_de_debit': request.POST.get('compte_de_debit')}
+        data = {
+            'type_operation': request.POST.get('type_operation'),
+            'montant': request.POST.get('montant'),
+            'compte_de_credit': request.POST.get('compte_de_credit'),
+            'compte_de_debit': request.POST.get('compte_de_debit')
+        }
 
         if rib_manuel:
             rib_response = requests.get(f"{API_BASE_URL_FONCT}/comptes/rib/{rib_manuel}/", headers=headers)
@@ -571,7 +615,10 @@ def lister_operations_en_attente(request):
         identifiant = operation.get('effectue_par_id')
         operation['effectue_par'] = infos_utilisateurs.get(identifiant)
 
-    return render(request, 'frontend_app/AGENT/operations_pending.html', {'operations': operations_en_attente,'user': utilisateur_connecte,})
+    return render(request, 'frontend_app/AGENT/operations_pending.html', {
+        'operations': operations_en_attente,
+        'user': utilisateur_connecte,
+    })
 
 
 @token_required
@@ -633,7 +680,9 @@ def afficher_logs_view(request):
 
     est_agent = utilisateur.get('role') == 'AGENT'
     url_base = "http://loggingservice:8003/logs/"
-    entetes = {'Authorization': f"Token {request.session.get('token')}"}
+    entetes = {
+        'Authorization': f"Token {request.session.get('token')}"
+    }
     if est_agent:
         parametres = request.GET.dict()
     else:
@@ -747,4 +796,7 @@ def voir_comptes_utilisateur_view(request, utilisateur_id):
         comptes = []
         messages.error(request, f"Erreur lors de la récupération des comptes (status {response.status_code})")
 
-    return render(request, "frontend_app/AGENT/voir_comptes_client.html", {"comptes": comptes,"utilisateur_id": utilisateur_id})
+    return render(request, "frontend_app/AGENT/voir_comptes_client.html", {
+        "comptes": comptes,
+        "utilisateur_id": utilisateur_id
+    })
