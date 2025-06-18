@@ -294,8 +294,6 @@ def validate_user_view(request, user_id):
         )
 
         if response.status_code == 200:
-            messages.success(request, "Utilisateur validé et activé avec succès.")
-            response_data = response.json()
             user_data = response.json().get('user', {})
             user_email = user_data.get('email', None)
             if user_email:
@@ -480,7 +478,6 @@ def creer_compte(request):
         response = requests.post(f"{API_BASE_URL_FONCT}/comptes/creer/", json=data, headers=headers)
 
         if response.status_code == 201:
-            messages.success(request, "Compte créé avec succès.")
             send_validation_email(user_email=request.session.get('user', {}).get('email'),message=f"Votre compte {numero_compte} a été créé avec succès. Un agent va le valider prochainement.")
             return redirect('lister_comptes')
         else:
@@ -664,10 +661,6 @@ def valider_compte_view(request, compte_id):
     if request.method == 'POST':
         headers = {'Authorization': f'Token {request.session["token"]}'}
         response = requests.post(f"{API_BASE_URL_FONCT}/comptes/valider/{compte_id}/", headers=headers)
-        if response.status_code == 200:
-            messages.success(request, "Compte validé avec succès.")
-        else:
-            messages.error(request, f"Erreur lors de la validation : {response.text}")
     return redirect('comptes_en_attente')
 
 
@@ -794,7 +787,6 @@ def voir_comptes_utilisateur_view(request, utilisateur_id):
             compte['date_creation_formatee'] = datetime.fromisoformat(compte['date_creation'].replace("Z", "")).strftime("%d/%m/%Y %H:%M")
     else:
         comptes = []
-        messages.error(request, f"Erreur lors de la récupération des comptes (status {response.status_code})")
 
     return render(request, "frontend_app/AGENT/voir_comptes_client.html", {
         "comptes": comptes,
