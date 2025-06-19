@@ -251,7 +251,6 @@ def create_agent_view(request):
         response = requests.post(f"{AUTH_API_URL}/api/auth/agents/create/", json=data, headers=headers)
 
         if response.status_code == 201:
-            messages.success(request, "Agent créé avec succès.")
             return redirect('dashboard')
         else:
             errors = response.json()
@@ -313,8 +312,9 @@ def reject_user_view(request, user_id):
     if request.method == 'POST':
         headers = {'Authorization': f"Token {request.session.get('token')}"}
         response = requests.delete(f"{AUTH_API_URL}/api/auth/users/{user_id}/reject/", headers=headers)
-    
-        if response.status_code == 204:
+
+
+        if response.status_code == 200:
             user_data = response.json().get('user', {})
             user_email = user_data.get('email', None)
             if user_email:
@@ -322,9 +322,11 @@ def reject_user_view(request, user_id):
                     user_email=user_email,
                     message=f"Votre compte a été rejeté par {user.get('username', 'un agent')}."
                 )
-            messages.success(request, "Utilisateur rejeté et supprimé avec succès.")
         else:
-            error_data = response.json()
+            try:
+                error_data = response.json()
+            except Exception:
+                error_data = response.text
             messages.error(request, f"Erreur lors du rejet: {error_data}")
     return redirect('pending_clients')
 
@@ -388,11 +390,6 @@ def gerer_utilisateur_action_view(request, utilisateur_id):
             headers=entetes,
             json={'is_active': False}
         )
-        if reponse.status_code == 200:
-            messages.success(request, "Utilisateur désactivé.")
-        else:
-            messages.error(request, "Erreur lors de la désactivation.")
-
     elif action == "delete":
         if a_comptes:
             suppression_reussie = True
@@ -420,10 +417,6 @@ def gerer_utilisateur_action_view(request, utilisateur_id):
 
     elif action == "enable":
         reponse = requests.post(f"{AUTH_API_URL}/api/auth/users/{utilisateur_id}/validate/",headers=entetes,json={'is_active': True})
-        if reponse.status_code == 200:
-            messages.success(request, "Utilisateur activé.")
-        else:
-            messages.error(request, "Erreur lors de l’activation.")
     
     return redirect('gerer_utilisateur')
 
@@ -579,6 +572,7 @@ def creer_operation_view(request, compte_id=None):
         response = requests.post(f"{API_BASE_URL_FONCT}/operations/creer/", json=data, headers=headers)
         if response.status_code == 201:
             messages.success(request, "Opération enregistrée avec succès.")
+            return redirect('lister_comptes')
         else:
             messages.error(request, f"Erreur: {response.text}")
 
