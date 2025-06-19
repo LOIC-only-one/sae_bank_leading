@@ -1,0 +1,345 @@
+{
+	"info": {
+		"_postman_id": "f8138721-88a6-403d-a655-e66e76cf1dee",
+		"name": "SAE_API_AUTH",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45078645",
+		"_collection_link": "https://cloudy-shuttle-1704995.postman.co/workspace/Maurer-Lo%C3%AFc's-Workspace~b2433a9b-9d53-49c4-8368-54aafe3aa3d0/collection/45078645-f8138721-88a6-403d-a655-e66e76cf1dee?action=share&source=collection_link&creator=45078645"
+	},
+	"item": [
+		{
+			"name": "FONCT",
+			"item": [
+				{
+					"name": "LISTE_COMPTE",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e0af0df771cc05a46b571b6f2342aa9a29b54b02",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8002/api/comptes/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8002",
+							"path": [
+								"api",
+								"comptes",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "LOGIN_AUTH",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 32412497f10f01b6a95de08d9113243fdc98dd86",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"toto\",\r\n    \"password\":\"toto\"\r\n}\r\n\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auth/login/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"login",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "REGISTER_AUTH",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"client1\",\r\n    \"email\": \"client1@example.com\",\r\n    \"first_name\": \"Jean\",\r\n    \"last_name\": \"Dupont\",\r\n    \"password\": \"MonMotDePasse123!\",\r\n    \"password_confirm\": \"MonMotDePasse123!\",\r\n    \"phone_number\": \"0123456789\",\r\n    \"address\": \"123 Rue de la Paix, Paris\",\r\n    \"role\": \"CLIENT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auth/register/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"register",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AGENTS_CREATE",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 32412497f10f01b6a95de08d9113243fdc98dd86",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"agent1_postman\",\r\n  \"email\": \"agent1.postman@test.com\",\r\n  \"first_name\": \"John\",\r\n  \"last_name\": \"Agent\",\r\n  \"password\": \"MotDePasseSecurise123!\",\r\n  \"password_confirm\": \"MotDePasseSecurise123!\",\r\n  \"phone_number\": \"0123456789\",\r\n  \"address\": \"123 Rue de l'Agent Postman\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auth/agents/create/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"agents",
+						"create",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LIST_OF_USERS",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 32412497f10f01b6a95de08d9113243fdc98dd86",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auth/users/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PROFILE_INFO_TOKEN",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 32412497f10f01b6a95de08d9113243fdc98dd86",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auth/profile/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"profile",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LIST_USERS_PENDING",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 32412497f10f01b6a95de08d9113243fdc98dd86",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auth/users/pending/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"users",
+						"pending",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PROFILE",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 32412497f10f01b6a95de08d9113243fdc98dd86",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auth/profile/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"profile",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "VALIDATE_TOKEN",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token edb6259552170b5112b8a0f81246562d74110912",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auth/users/validate-token/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"users",
+						"validate-token",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
