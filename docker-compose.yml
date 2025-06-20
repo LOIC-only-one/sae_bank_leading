@@ -33,7 +33,7 @@ services:
       python manage.py makemigrations &&
       python manage.py migrate &&
       python manage.py createsuperuser --noinput --username admin --email admin@example.com &&
-      echo \"from django.contrib.auth import get_user_model; User = get_user_model(); user = User.objects.get(username='admin'); user.set_password('adminpassword'); user.save()\" | python manage.py shell &&
+      echo \"from django.contrib.auth import get_user_model; User = get_user_model(); user, created = User.objects.get_or_create(username='admin', defaults={'email': 'admin@example.com'}); user.set_password('adminpassword'); user.save()\" | python manage.py shell &&
       python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
